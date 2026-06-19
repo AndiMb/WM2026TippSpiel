@@ -1,0 +1,158 @@
+# ⚽ WM 2026 Tippspiel
+
+Ein einfaches, kinderfreundliches **Familien-Tippspiel** zur FIFA Fußball-
+Weltmeisterschaft 2026. Tippt gemeinsam Spielergebnisse, sammelt Punkte und
+messt euch in der Rangliste – im Browser auf Smartphone und PC, ganz ohne
+App-Installation.
+
+> Entwickelt mit **PHP 8.2**, **SQLite/MariaDB** und **Vanilla JavaScript** –
+> bewusst ohne Framework-Ballast, Docker oder Node.js. Läuft auf jedem
+> klassischen Apache-Webspace.
+
+---
+
+## ✨ Funktionen
+
+* **Kinderleichte Bedienung** – große Buttons, große Zahlenfelder, klare
+  Sprache. Auch für Kinder ab 9 Jahren problemlos nutzbar.
+* **Dashboard** – nächste Spiele, eigene offene Tipps, aktuelle Rangliste und
+  Punkteübersicht auf einen Blick.
+* **Tippen** – pro Spiel Heim- und Auswärtstore eintippen; Tippschluss ist der
+  Anpfiff. Bereits gespielte Spiele sind gesperrt.
+* **Automatischer Spielplan-Import** aus einer kostenlosen, öffentlichen Quelle
+  ([OpenFootball](https://github.com/openfootball/worldcup.json), kein API-Key)
+  – inkl. **JSON-/CSV-Fallback** und manuellem Import.
+* **Ergebnisse** automatisch per Cronjob **oder** manuell durch den Admin.
+* **Faire Nachhol-Regel** für einen Start während der laufenden WM
+  (Variante A: Vergangenes zählt mit 0 Punkten · Variante B: Wertung erst ab
+  Beitritt).
+* **Konfigurierbares Punktesystem** (exaktes Ergebnis / Tordifferenz / Tendenz).
+* **Rangliste** mit Platz, Punkten, exakten Tipps und richtigen Tendenzen.
+* **Bonusfragen** (Weltmeister, Finalist, Torschützenkönig …), optional
+  aktivierbar, mit konfigurierbaren Punkten.
+* **Adminbereich** – Benutzer, Spiele, Ergebnisse, Bonusfragen und Einstellungen
+  verwalten; Punkte neu berechnen.
+* **Sicher** – Passwort-Hashing (`password_hash`), CSRF-Schutz, gehärtetes
+  Session-Management, serverseitige Input-Validierung.
+* **Responsive & barrierearm** – mobil-first, hoher Kontrast, große Touch-Flächen.
+
+---
+
+## 🧭 Navigation (für Spieler)
+
+| Bereich | Inhalt |
+|---------|--------|
+| 🏠 **Start** | Dashboard mit Überblick |
+| ✏️ **Tippen** | Kommende Spiele tippen |
+| 🏆 **Rangliste** | Aktuelle Tabelle |
+| 👤 **Konto** | Profil, Passwort, Bonus-Tipps |
+| ⚙️ **Admin** | nur für Administratoren |
+
+---
+
+## 🏆 Punkte-System (Standard, konfigurierbar)
+
+| Tipp | Punkte |
+|------|:------:|
+| Exaktes Ergebnis | **3** |
+| Richtige Tordifferenz (kein Remis) | **2** |
+| Richtiger Sieger / Unentschieden | **1** |
+| Falsch | **0** |
+
+Sortierung der Rangliste: **Punkte → exakte Ergebnisse → richtige Tendenzen**.
+
+---
+
+## 🚀 Schnellstart
+
+```bash
+# 1) Konfiguration anlegen
+cp config/config.example.php config/config.php   # danach anpassen
+
+# 2) Datenbank einrichten
+php database/migrate.php
+php database/seed.php          # legt Admin (admin / admin123) an
+
+# 3) Lokal testen (Entwicklung)
+php -S localhost:8000 -t public
+#   -> http://localhost:8000  (Login: admin / admin123)
+```
+
+Für die Produktivinstallation auf Apache siehe **[INSTALL.md](INSTALL.md)**.
+
+> ⚠️ Standard-Admin-Passwort nach dem ersten Login ändern!
+
+---
+
+## 🗂️ Projektstruktur
+
+```
+tippspiel/
+├── public/                 # Apache DocumentRoot (Front-Controller + Assets)
+│   ├── index.php           # Einstiegspunkt / Router-Bootstrap
+│   ├── .htaccess           # Rewrite auf index.php + Security-Header
+│   └── assets/             # CSS, JS, Bilder
+├── src/
+│   ├── bootstrap.php       # Autoloader, Config, DB-Init
+│   ├── helpers.php         # globale Hilfsfunktionen (url, e, csrf …)
+│   ├── Core/               # Database, Router, Auth, Session, Csrf, View
+│   ├── Models/             # User, MatchModel, Bet, Setting, BonusQuestion
+│   ├── Services/           # ScoringService, StandingsService,
+│   │                       #   ScheduleImporter, ResultUpdater
+│   └── Controllers/        # Auth/Dashboard/Bet/Standings/Account + Admin/*
+├── views/                  # PHP-Templates (Layout + Seiten)
+├── config/                 # config.example.php (Vorlage)
+├── database/               # Schema (SQLite+MySQL), migrate.php, seed.php
+├── bin/                    # Cron-Skripte (Import / Ergebnisse)
+├── data/                   # SQLite-DB + Importdateien (nicht öffentlich)
+├── INSTALL.md
+└── README.md
+```
+
+---
+
+## 🔌 Datenquelle (APIs)
+
+Primärquelle ist **OpenFootball worldcup.json** – Public Domain, kein API-Key,
+keine Registrierung, eine einzige JSON-Datei mit Spielplan **und** Ergebnissen.
+Sie wird per Cronjob aktualisiert. Die Architektur ist quellen-agnostisch:
+
+* **Online-Import** (OpenFootball) – Standard
+* **JSON-Import** – flaches Format oder OpenFootball-Format
+* **CSV-Import** – `date,time,team1,team2,group,venue,score1,score2`
+* **Manuelle Eingabe** – Ergebnisse jederzeit im Adminbereich pflegbar
+
+Damit funktioniert das Tippspiel auch dann, wenn keine API erreichbar ist.
+
+---
+
+## 📸 Screenshots
+
+> _Platzhalter – hier später eigene Screenshots einfügen._
+
+| Login | Dashboard | Tippen |
+|-------|-----------|--------|
+| ![Login](public/assets/img/screenshot-login.png) | ![Dashboard](public/assets/img/screenshot-dashboard.png) | ![Tippen](public/assets/img/screenshot-bets.png) |
+
+| Rangliste | Adminbereich |
+|-----------|--------------|
+| ![Rangliste](public/assets/img/screenshot-standings.png) | ![Admin](public/assets/img/screenshot-admin.png) |
+
+---
+
+## 🔒 Sicherheit
+
+* Passwörter werden mit `password_hash()` (bcrypt) gespeichert und bei Bedarf
+  automatisch neu gehasht.
+* Alle ändernden Aktionen sind durch **CSRF-Token** geschützt.
+* Session-Cookies sind `HttpOnly`, `SameSite=Lax` und (bei HTTPS) `Secure`;
+  die Session-ID wird beim Login erneuert.
+* Sämtliche Ausgaben werden per `e()` HTML-escaped, alle Eingaben serverseitig
+  validiert; Datenbankzugriffe ausschließlich über vorbereitete Statements.
+
+---
+
+## 📄 Lizenz
+
+Zur freien privaten Nutzung im Familienkreis. Spieldaten von OpenFootball stehen
+in der Public Domain.

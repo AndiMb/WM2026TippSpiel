@@ -1,0 +1,60 @@
+<?php
+/** @var string $title @var string $content @var array $flashes @var ?array $user @var bool $isAdmin @var string $active */
+?><!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1b8a5a">
+    <title><?= e($title) ?> · <?= e(config('app.name')) ?></title>
+    <link rel="stylesheet" href="<?= e(url('/assets/css/style.css')) ?>?v=1">
+    <link rel="icon" href="<?= e(url('/assets/img/favicon.svg')) ?>" type="image/svg+xml">
+</head>
+<body>
+
+<?php if ($user): ?>
+<header class="topbar">
+    <a class="brand" href="<?= e(url('/dashboard')) ?>">
+        <span class="brand-ball" aria-hidden="true">⚽</span>
+        <span class="brand-text"><?= e(config('app.name')) ?></span>
+    </a>
+    <form class="logout-form" method="post" action="<?= e(url('/logout')) ?>">
+        <?= csrf_field() ?>
+        <button class="btn-logout" type="submit" title="Abmelden">Abmelden</button>
+    </form>
+</header>
+<?php endif; ?>
+
+<main class="container">
+    <?php foreach ($flashes as $f): ?>
+        <div class="flash flash-<?= e($f['type']) ?>"><?= e($f['message']) ?></div>
+    <?php endforeach; ?>
+
+    <?= $content /* bereits in den Views via e() escaped */ ?>
+</main>
+
+<?php if ($user): ?>
+<nav class="bottomnav" aria-label="Hauptnavigation">
+    <a href="<?= e(url('/dashboard')) ?>" class="<?= $active === 'dashboard' ? 'is-active' : '' ?>">
+        <span class="nav-ico">🏠</span><span class="nav-lbl">Start</span>
+    </a>
+    <a href="<?= e(url('/tippen')) ?>" class="<?= $active === 'tippen' ? 'is-active' : '' ?>">
+        <span class="nav-ico">✏️</span><span class="nav-lbl">Tippen</span>
+    </a>
+    <a href="<?= e(url('/rangliste')) ?>" class="<?= $active === 'rangliste' ? 'is-active' : '' ?>">
+        <span class="nav-ico">🏆</span><span class="nav-lbl">Rangliste</span>
+    </a>
+    <a href="<?= e(url('/konto')) ?>" class="<?= $active === 'konto' ? 'is-active' : '' ?>">
+        <span class="nav-ico">👤</span><span class="nav-lbl">Konto</span>
+    </a>
+    <?php if ($isAdmin): ?>
+    <a href="<?= e(url('/admin')) ?>" class="<?= $active === 'admin' ? 'is-active' : '' ?>">
+        <span class="nav-ico">⚙️</span><span class="nav-lbl">Admin</span>
+    </a>
+    <?php endif; ?>
+</nav>
+<?php endif; ?>
+
+<script src="<?= e(url('/assets/js/app.js')) ?>?v=1" defer></script>
+</body>
+</html>

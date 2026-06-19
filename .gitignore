@@ -1,0 +1,21 @@
+# Lokale Konfiguration (enthält Geheimnisse) – niemals einchecken!
+/config/config.php
+
+# SQLite-Datenbank und Laufzeitdaten
+/data/*.sqlite
+/data/*.sqlite-wal
+/data/*.sqlite-shm
+/data/*.db
+
+# Hochgeladene / generierte Importdateien (Beispiele bleiben erhalten)
+/data/import/fixtures.json
+/data/import/fixtures.csv
+
+# Logs
+*.log
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

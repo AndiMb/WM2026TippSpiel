@@ -1,0 +1,34 @@
+# =====================================================================
+#  Apache-Konfiguration für das öffentliche Verzeichnis (DocumentRoot).
+#  Leitet alle Anfragen, die nicht auf eine echte Datei zeigen, an den
+#  Front-Controller index.php weiter.
+# =====================================================================
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Falls die App in einem Unterordner läuft, hier den Pfad setzen,
+    # z.B. RewriteBase /tippspiel/
+    # RewriteBase /
+
+    # Vorhandene Dateien/Ordner (CSS, JS, Bilder) direkt ausliefern.
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Alles andere an den Front-Controller.
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+# Sicherheits-Header
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "same-origin"
+</IfModule>
+
+# Verzeichnis-Listing abschalten
+Options -Indexes
+
+# Standard-Zeichensatz
+AddDefaultCharset UTF-8

@@ -1,0 +1,25 @@
+{
+  "_hinweis": "Beispiel für den manuellen JSON-Import (Fallback ohne API). Unterstützt wird sowohl dieses flache Format als auch das OpenFootball-Format mit 'matches'.",
+  "fixtures": [
+    {
+      "date": "2026-06-25",
+      "time": "18:00 UTC-6",
+      "team1": "Deutschland",
+      "team2": "Brasilien",
+      "group": "Group F",
+      "venue": "MetLife Stadium",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "date": "2026-06-26",
+      "time": "21:00 UTC-4",
+      "team1": "Argentinien",
+      "team2": "Frankreich",
+      "group": "Group C",
+      "venue": "SoFi Stadium",
+      "score1": 2,
+      "score2": 1
+    }
+  ]
+}

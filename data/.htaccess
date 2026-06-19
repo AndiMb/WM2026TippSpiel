@@ -1,0 +1,3 @@
+# Datenverzeichnis: niemals direkt über den Webserver zugänglich machen.
+Require all denied
+Deny from all

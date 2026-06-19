@@ -1,0 +1,15 @@
+# Schutz für den Fall, dass das Projektverzeichnis (statt public/) als
+# DocumentRoot dient. Verhindert direkten Zugriff auf Quellcode, Config
+# und Datenbank. EMPFOHLEN ist trotzdem: DocumentRoot auf public/ setzen.
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # Anfragen an public/ erlauben, alles andere dorthin umleiten.
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+# Sensible Verzeichnisse/Dateien komplett sperren.
+<FilesMatch "\.(sqlite|sqlite3|db|sql|md|log)$">
+    Require all denied
+</FilesMatch>
