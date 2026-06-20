@@ -36,9 +36,9 @@
                 <div class="match-row">
                     <div class="match-info">
                         <div class="match-teams">
-                            <span class="team"><?= e($m['team1']) ?></span>
+                            <span class="team"><?= e(tname($m['team1'])) ?></span>
                             <span class="vs">–</span>
-                            <span class="team"><?= e($m['team2']) ?></span>
+                            <span class="team"><?= e(tname($m['team2'])) ?></span>
                         </div>
                         <div class="match-meta"><?= e(fmt_datetime($m['kickoff'])) ?> Uhr</div>
                     </div>
@@ -80,15 +80,16 @@
 <?php if ($recent): ?>
 <section class="section">
     <h2 class="section-title">Letzte Ergebnisse</h2>
+    <a class="link-more" href="<?= e(url('/tipps')) ?>">👀 Tipps der anderen ansehen →</a>
     <div class="match-list">
         <?php foreach ($recent as $m):
             $bet = $betMap[(int) $m['id']] ?? null; ?>
             <div class="match-row">
                 <div class="match-info">
                     <div class="match-teams">
-                        <span class="team"><?= e($m['team1']) ?></span>
+                        <span class="team"><?= e(tname($m['team1'])) ?></span>
                         <span class="score-final"><?= (int) $m['score1'] ?>:<?= (int) $m['score2'] ?></span>
-                        <span class="team"><?= e($m['team2']) ?></span>
+                        <span class="team"><?= e(tname($m['team2'])) ?></span>
                     </div>
                     <div class="match-meta"><?= e(fmt_datetime($m['kickoff'], 'd.m.Y')) ?></div>
                 </div>

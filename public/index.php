@@ -14,6 +14,7 @@ use App\Controllers\AuthController;
 use App\Controllers\DashboardController;
 use App\Controllers\BetController;
 use App\Controllers\StandingsController;
+use App\Controllers\TipsController;
 use App\Controllers\AccountController;
 use App\Controllers\Admin\AdminController;
 use App\Controllers\Admin\UserController;
@@ -38,6 +39,7 @@ $router->get('/tippen',    [BetController::class, 'index']);
 $router->post('/tippen',   [BetController::class, 'save']);
 
 $router->get('/rangliste', [StandingsController::class, 'index']);
+$router->get('/tipps',     [TipsController::class, 'index']);
 
 $router->get('/konto',         [AccountController::class, 'index']);
 $router->post('/konto/passwort',[AccountController::class, 'changePassword']);
