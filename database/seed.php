@@ -19,6 +19,7 @@ require __DIR__ . '/../src/bootstrap.php';
 use App\Core\Database as DB;
 use App\Models\Setting;
 use App\Models\User;
+use App\Services\TeamService;
 
 $adminUser = 'admin';
 $adminPass = $argv[1] ?? 'admin123';     // Bitte nach dem ersten Login ändern!
@@ -54,6 +55,10 @@ if ($haveBonus === 0) {
          VALUES ('topscorer', 'Wer wird Torschützenkönig?', 5, 1, ?)", [DB::now()]);
     echo "  + 2 Beispiel-Bonusfragen angelegt (Bonus ist standardmäßig deaktiviert).\n";
 }
+
+// 4) Mannschafts-Stammdaten (deutsche Namen + FIFA-Rang) einspielen.
+$teams = TeamService::syncFromData();
+echo "  + $teams Mannschaften synchronisiert (deutsche Namen + FIFA-Rang).\n";
 
 echo "✓ Seed abgeschlossen.\n";
 echo "Nächster Schritt: Spielplan importieren (Adminbereich) oder\n";

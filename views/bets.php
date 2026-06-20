@@ -1,7 +1,30 @@
 <?php /** @var array $matches @var array $betMap */ ?>
 
+<?php
+/**
+ * Kleiner Helfer: zeigt FIFA-Rang und das letzte Spielergebnis einer
+ * Mannschaft als kurzen Hinweis (Anhaltspunkt für den Tipp).
+ */
+$forms = $forms ?? [];
+$teamHint = function (string $en) use ($forms): string {
+    $parts = [];
+    $rank = \App\Services\TeamService::rank($en);
+    if ($rank) {
+        $parts[] = 'FIFA #' . $rank;
+    }
+    if (isset($forms[$en])) {
+        $f = $forms[$en];
+        $icon = $f['outcome'] === 'win' ? '✅' : ($f['outcome'] === 'loss' ? '❌' : '➖');
+        $parts[] = 'zuletzt ' . $icon . ' ' . (int) $f['gf'] . ':' . (int) $f['ga']
+                 . ' gg. ' . e(tname($f['opp']));
+    }
+    return implode(' · ', $parts);
+};
+?>
+
 <h1 class="page-title">Spiele tippen</h1>
-<p class="muted intro">Tippe das Endergebnis. Du kannst deinen Tipp bis zum Anpfiff ändern.</p>
+<p class="muted intro">Tippe das Endergebnis. Du kannst deinen Tipp bis zum Anpfiff ändern.
+Die kleinen Hinweise (FIFA-Rang, letztes Spiel) helfen beim Schätzen.</p>
 
 <?php if (!$matches): ?>
     <div class="empty">
@@ -32,7 +55,10 @@
                 <?php if (!empty($m['venue'])): ?>· <?= e($m['venue']) ?><?php endif; ?>
             </div>
             <div class="bet-card-row">
-                <div class="bet-team bet-team-home"><?= e($m['team1']) ?></div>
+                <div class="bet-team bet-team-home">
+                    <div class="bet-team-name"><?= e(tname($m['team1'])) ?></div>
+                    <div class="team-hint"><?= $teamHint($m['team1']) ?></div>
+                </div>
 
                 <div class="bet-inputs">
                     <input class="score-input" type="number" inputmode="numeric"
@@ -46,7 +72,10 @@
                            aria-label="Tore <?= e($m['team2']) ?>" placeholder="–">
                 </div>
 
-                <div class="bet-team bet-team-away"><?= e($m['team2']) ?></div>
+                <div class="bet-team bet-team-away">
+                    <div class="bet-team-name"><?= e(tname($m['team2'])) ?></div>
+                    <div class="team-hint"><?= $teamHint($m['team2']) ?></div>
+                </div>
             </div>
         </div>
     <?php endforeach; ?>

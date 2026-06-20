@@ -2,6 +2,8 @@
 
 <h1 class="page-title">🏆 Rangliste</h1>
 
+<a class="btn btn-small" href="<?= e(url('/tipps')) ?>">👀 Tipps der anderen ansehen</a>
+
 <p class="muted intro">
     <?php if ($scoringMode === 'since_join'): ?>
         Gewertet werden nur Spiele ab deinem Beitritt.

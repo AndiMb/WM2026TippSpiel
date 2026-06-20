@@ -8,6 +8,7 @@ use App\Core\Session;
 use App\Core\View;
 use App\Models\Bet;
 use App\Models\MatchModel;
+use App\Services\TeamService;
 
 final class BetController
 {
@@ -24,6 +25,7 @@ final class BetController
             '_active' => 'tippen',
             'matches' => $matches,
             'betMap'  => $betMap,
+            'forms'   => TeamService::lastResultsMap(), // letztes Ergebnis je Team
         ], 'Spiele tippen');
     }
 

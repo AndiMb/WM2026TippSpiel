@@ -15,6 +15,14 @@ App-Installation.
 
 * **Kinderleichte Bedienung** – große Buttons, große Zahlenfelder, klare
   Sprache. Auch für Kinder ab 9 Jahren problemlos nutzbar.
+* **Deutsche Ländernamen** – automatische Übersetzung der englischen Quelldaten
+  (anpassbar in `src/Data/teams.php`).
+* **Tipphilfen** – pro Mannschaft FIFA-Weltranglistenplatz und letztes
+  Spielergebnis, damit auch Kinder Anhaltspunkte für ihren Tipp haben.
+* **Tipps der anderen** – Übersicht aller Mitspieler-Tipps, fair erst **nach
+  Anpfiff** sichtbar.
+* **Sichere Updates** – versioniertes Migrationssystem; bestehende Daten bleiben
+  bei Aktualisierungen erhalten (siehe **[UPDATE.md](UPDATE.md)**).
 * **Dashboard** – nächste Spiele, eigene offene Tipps, aktuelle Rangliste und
   Punkteübersicht auf einen Blick.
 * **Tippen** – pro Spiel Heim- und Auswärtstore eintippen; Tippschluss ist der
@@ -79,6 +87,7 @@ php -S localhost:8000 -t public
 ```
 
 Für die Produktivinstallation auf Apache siehe **[INSTALL.md](INSTALL.md)**.
+Für das Aktualisieren einer bestehenden Installation siehe **[UPDATE.md](UPDATE.md)**.
 
 > ⚠️ Standard-Admin-Passwort nach dem ersten Login ändern!
 
@@ -97,13 +106,15 @@ tippspiel/
 │   ├── helpers.php         # globale Hilfsfunktionen (url, e, csrf …)
 │   ├── Core/               # Database, Router, Auth, Session, Csrf, View
 │   ├── Models/             # User, MatchModel, Bet, Setting, BonusQuestion
-│   ├── Services/           # ScoringService, StandingsService,
-│   │                       #   ScheduleImporter, ResultUpdater
-│   └── Controllers/        # Auth/Dashboard/Bet/Standings/Account + Admin/*
+│   ├── Services/           # Scoring, Standings, Schedule/Result-Import,
+│   │                       #   TeamService (Namen/Rang), TipsService
+│   ├── Data/               # teams.php (DE-Namen + FIFA-Rang)
+│   └── Controllers/        # Auth/Dashboard/Bet/Standings/Tips/Account + Admin/*
 ├── views/                  # PHP-Templates (Layout + Seiten)
 ├── config/                 # config.example.php (Vorlage)
 ├── database/               # Schema (SQLite+MySQL), migrate.php, seed.php
-├── bin/                    # Cron-Skripte (Import / Ergebnisse)
+│   └── migrations/         # versionierte Migrationen (002_teams.sql …)
+├── bin/                    # Cron-/Pflege-Skripte (Import, Ergebnisse, Teams)
 ├── data/                   # SQLite-DB + Importdateien (nicht öffentlich)
 ├── INSTALL.md
 └── README.md

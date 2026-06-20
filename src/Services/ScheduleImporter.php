@@ -225,6 +225,13 @@ final class ScheduleImporter
             }
         }
 
+        // Mannschafts-Stammdaten (deutsche Namen, FIFA-Rang) aktuell halten.
+        try {
+            TeamService::syncFromData();
+        } catch (\Throwable $e) {
+            // Tabelle teams evtl. noch nicht vorhanden -> Import nicht abbrechen.
+        }
+
         return ['inserted' => $inserted, 'updated' => $updated, 'scored' => $scored];
     }
 
