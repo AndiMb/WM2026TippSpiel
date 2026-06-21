@@ -49,6 +49,9 @@
     <a href="<?= e(url('/tippen')) ?>" class="<?= $active === 'tippen' ? 'is-active' : '' ?>">
         <span class="nav-ico">✏️</span><span class="nav-lbl">Tippen</span>
     </a>
+    <a href="<?= e(url('/turnier')) ?>" class="<?= $active === 'turnier' ? 'is-active' : '' ?>">
+        <span class="nav-ico">🏟️</span><span class="nav-lbl">Turnier</span>
+    </a>
     <a href="<?= e(url('/rangliste')) ?>" class="<?= $active === 'rangliste' ? 'is-active' : '' ?>">
         <span class="nav-ico">🏆</span><span class="nav-lbl">Rangliste</span>
     </a>

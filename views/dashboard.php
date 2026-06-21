@@ -24,6 +24,10 @@
     </a>
 <?php endif; ?>
 
+<a class="cta-banner cta-secondary" href="<?= e(url('/turnier')) ?>">
+    🏟️ Gruppentabellen &amp; Turnierbaum ansehen
+</a>
+
 <!-- Nächste Spiele -->
 <section class="section">
     <h2 class="section-title">Nächste Spiele</h2>
