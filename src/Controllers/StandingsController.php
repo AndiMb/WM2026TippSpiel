@@ -20,6 +20,6 @@ final class StandingsController
             'bonusEnabled' => Setting::bool('bonus_enabled'),
             'scoringMode'  => Setting::get('scoring_mode'),
             'meId'         => Auth::id(),
-        ], 'Rangliste');
+        ], t('nav.standings'));
     }
 }

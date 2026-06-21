@@ -37,6 +37,6 @@ final class DashboardController
             'standings'  => array_slice($standings, 0, 5),
             'me'         => $me,
             'recent'     => MatchModel::finished(5),
-        ], 'Dashboard');
+        ], t('nav.start'));
     }
 }

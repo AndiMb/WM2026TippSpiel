@@ -32,20 +32,28 @@ final class User
         string $username,
         string $password,
         string $displayName,
-        string $role = 'player'
+        string $role = 'player',
+        string $locale = 'de'
     ): int {
         return DB::insert(
-            'INSERT INTO users (username, password_hash, display_name, role, joined_at, created_at)
-             VALUES (?, ?, ?, ?, ?, ?)',
+            'INSERT INTO users (username, password_hash, display_name, role, locale, joined_at, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?)',
             [
                 $username,
                 password_hash($password, PASSWORD_DEFAULT),
                 $displayName,
                 $role,
+                $locale,
                 DB::now(),   // Beitrittszeitpunkt = jetzt (relevant für Variante B)
                 DB::now(),
             ]
         );
+    }
+
+    /** Bevorzugte Sprache eines Benutzers setzen. */
+    public static function updateLocale(int $id, string $locale): void
+    {
+        DB::run('UPDATE users SET locale = ? WHERE id = ?', [$locale, $id]);
     }
 
     public static function updatePassword(int $id, string $password): void
@@ -54,10 +62,10 @@ final class User
             [password_hash($password, PASSWORD_DEFAULT), $id]);
     }
 
-    public static function update(int $id, string $displayName, string $role, int $isActive): void
+    public static function update(int $id, string $displayName, string $role, int $isActive, string $locale = 'de'): void
     {
-        DB::run('UPDATE users SET display_name = ?, role = ?, is_active = ? WHERE id = ?',
-            [$displayName, $role, $isActive, $id]);
+        DB::run('UPDATE users SET display_name = ?, role = ?, is_active = ?, locale = ? WHERE id = ?',
+            [$displayName, $role, $isActive, $locale, $id]);
     }
 
     public static function delete(int $id): void

@@ -17,6 +17,6 @@ final class TipsController
             '_active' => 'rangliste', // gehört thematisch zur Rangliste
             'matches' => TipsService::recentMatchesWithTips(20),
             'meId'    => Auth::id(),
-        ], 'Tipps der anderen');
+        ], t('tips.title'));
     }
 }

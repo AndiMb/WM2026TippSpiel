@@ -6,26 +6,29 @@ namespace App\Services;
 use App\Models\MatchModel;
 
 /**
- * Baut den Turnierbaum der KO-Phase und löst die Platzhalter der Quelle auf:
+ * Baut den Turnierbaum der KO-Phase als echten Baum und löst die Platzhalter
+ * der Quelle auf:
  *
  *   1A / 2B      -> 1./2. der Gruppe A bzw. B (aus dem AKTUELLEN Tabellenstand)
  *   3A/B/C/D/F   -> einer der besten Gruppendritten (nicht eindeutig -> Label)
  *   W73 / L101   -> Sieger/Verlierer von Spiel 73 bzw. 101 (echtes Team, sobald
- *                   das Spiel gespielt ist; sonst Label "Sieger Spiel 73")
+ *                   das Spiel gespielt ist; sonst Label)
  *
- * Für das Sechzehntelfinale wird – wie gewünscht – der aktuelle Gruppen-
- * Tabellenstand verwendet, um 1./2.-Platzierte projiziert anzuzeigen.
+ * Zusätzlich wird die Baumstruktur berechnet:
+ *   - die Spiele jeder Runde werden so sortiert, dass zusammengehörende Paare
+ *     untereinander stehen (für eine erkennbare Baumdarstellung)
+ *   - je Spiel wird vermerkt, in welches Folgespiel der Sieger kommt
+ *     ('advances_to'), damit man dem Pfad folgen kann.
+ *
+ * Die Beschriftungen werden NICHT hier übersetzt, sondern als strukturierte
+ * Angaben zurückgegeben und in der View sprachabhängig formatiert.
  */
 final class BracketService
 {
-    /** Runden in Reihenfolge: Quelle-Name => deutscher Titel. */
-    private const ROUNDS = [
-        'Round of 32'           => 'Sechzehntelfinale',
-        'Round of 16'           => 'Achtelfinale',
-        'Quarter-final'         => 'Viertelfinale',
-        'Semi-final'            => 'Halbfinale',
-        'Match for third place' => 'Spiel um Platz 3',
-        'Final'                 => 'Finale',
+    /** Runden in Reihenfolge (Quelle-Bezeichnung). Anzeige via t('round.<name>'). */
+    private const ROUND_ORDER = [
+        'Round of 32', 'Round of 16', 'Quarter-final',
+        'Semi-final', 'Match for third place', 'Final',
     ];
 
     public static function build(): array
@@ -35,7 +38,7 @@ final class BracketService
             return [];
         }
 
-        // Index nach Spielnummer (für W##/L##-Auflösung).
+        // Index nach Spielnummer.
         $byNum = [];
         foreach ($matches as $m) {
             if ($m['num'] !== null) {
@@ -43,41 +46,102 @@ final class BracketService
             }
         }
 
+        // Sieger-Folgespiel je Spielnummer ermitteln (für "advances_to").
+        $advancesTo = [];
+        foreach ($matches as $m) {
+            foreach ([$m['team1'], $m['team2']] as $slot) {
+                if (preg_match('/^W(\d+)$/', (string) $slot, $mm)) {
+                    $advancesTo[(int) $mm[1]] = $m['num'] !== null ? (int) $m['num'] : null;
+                }
+            }
+        }
+
+        // Baum-Reihenfolge berechnen (DFS ab dem Finale).
+        $order = [];
+        $finalNum = self::roundFirstNum($matches, 'Final');
+        if ($finalNum !== null) {
+            $leaf = 0;
+            self::placeInTree($finalNum, $byNum, $order, $leaf);
+        }
+
         $standings = GroupsService::standings();
 
-        // Runden in definierter Reihenfolge füllen.
+        // Runden aufbauen.
         $rounds = [];
-        foreach (self::ROUNDS as $src => $titleDe) {
-            $rounds[$src] = ['title' => $titleDe, 'matches' => []];
+        foreach (self::ROUND_ORDER as $src) {
+            $rounds[$src] = ['name' => $src, 'matches' => []];
         }
         foreach ($matches as $m) {
             $round = $m['round_name'];
             if (!isset($rounds[$round])) {
-                // Unbekannte Rundenbezeichnung ans Ende hängen.
-                $rounds[$round] = ['title' => $round ?: 'KO-Runde', 'matches' => []];
+                $rounds[$round] = ['name' => $round ?: 'KO', 'matches' => []];
             }
+            $num = $m['num'] !== null ? (int) $m['num'] : null;
             $rounds[$round]['matches'][] = [
-                'num'     => $m['num'] !== null ? (int) $m['num'] : null,
-                'team1'   => self::resolve($m['team1'], $standings, $byNum),
-                'team2'   => self::resolve($m['team2'], $standings, $byNum),
-                'score1'  => $m['score1'],
-                'score2'  => $m['score2'],
-                'status'  => $m['status'],
-                'kickoff' => $m['kickoff'],
-                'venue'   => $m['venue'],
+                'num'         => $num,
+                'team1'       => self::resolve($m['team1'], $standings, $byNum),
+                'team2'       => self::resolve($m['team2'], $standings, $byNum),
+                'score1'      => $m['score1'],
+                'score2'      => $m['score2'],
+                'status'      => $m['status'],
+                'kickoff'     => $m['kickoff'],
+                'advances_to' => $num !== null ? ($advancesTo[$num] ?? null) : null,
+                '_order'      => $num !== null ? ($order[$num] ?? PHP_INT_MAX) : PHP_INT_MAX,
             ];
         }
 
-        // Leere Runden entfernen.
+        // Spiele je Runde in Baum-Reihenfolge sortieren.
+        foreach ($rounds as &$r) {
+            usort($r['matches'], fn($a, $b) => $a['_order'] <=> $b['_order']);
+        }
+        unset($r);
+
         return array_values(array_filter($rounds, fn($r) => !empty($r['matches'])));
+    }
+
+    /** Erste Spielnummer einer Runde. */
+    private static function roundFirstNum(array $matches, string $round): ?int
+    {
+        foreach ($matches as $m) {
+            if ($m['round_name'] === $round && $m['num'] !== null) {
+                return (int) $m['num'];
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Ordnet die Spiele rekursiv im Baum an. Blätter (Sechzehntelfinale)
+     * bekommen fortlaufende Werte, innere Knoten den Mittelwert ihrer Kinder –
+     * so stehen zusammengehörende Paare zentriert untereinander.
+     */
+    private static function placeInTree(int $num, array $byNum, array &$order, int &$leaf): float
+    {
+        $m = $byNum[$num] ?? null;
+        if (!$m) {
+            return $order[$num] = $leaf++;
+        }
+        // Kinder = Spiele, auf die sich W##-Platzhalter beziehen.
+        $children = [];
+        foreach ([$m['team1'], $m['team2']] as $slot) {
+            if (preg_match('/^W(\d+)$/', (string) $slot, $mm) && isset($byNum[(int) $mm[1]])) {
+                $children[] = (int) $mm[1];
+            }
+        }
+        if (!$children) {
+            return $order[$num] = $leaf++;
+        }
+        $vals = [];
+        foreach ($children as $c) {
+            $vals[] = self::placeInTree($c, $byNum, $order, $leaf);
+        }
+        return $order[$num] = (min($vals) + max($vals)) / 2;
     }
 
     /**
      * Löst einen Mannschafts-Platzhalter auf.
      *
-     * @return array{type:string, en?:string, label?:string, proj?:bool}
-     *   type 'team'  -> echtes/projiziertes Team (Feld 'en')
-     *   type 'label' -> beschreibender Text (Feld 'label')
+     * @return array{type:string, en?:string, proj?:bool, kind?:string, grp?:string, grps?:string, num?:int, label?:string}
      */
     private static function resolve(string $token, array $standings, array $byNum): array
     {
@@ -90,14 +154,12 @@ final class BracketService
             if ($team !== null && self::isRealTeam($team)) {
                 return ['type' => 'team', 'en' => $team, 'proj' => true];
             }
-            $label = ($pos === 1 ? 'Sieger Gruppe ' : '2. Gruppe ') . $mm[2];
-            return ['type' => 'label', 'label' => $label];
+            return ['type' => 'label', 'kind' => $pos === 1 ? 'group_winner' : 'group_second', 'grp' => $mm[2]];
         }
 
         // 3A/B/C/D/F -> einer der besten Gruppendritten (nicht eindeutig)
         if (preg_match('#^3([A-L])(?:/[A-L])+$#', $token)) {
-            $letters = substr($token, 1);
-            return ['type' => 'label', 'label' => '3. aus Gruppe ' . $letters];
+            return ['type' => 'label', 'kind' => 'group_third', 'grps' => substr($token, 1)];
         }
 
         // W73 / L101 -> Sieger/Verlierer eines Spiels
@@ -108,15 +170,14 @@ final class BracketService
             if ($team !== null) {
                 return ['type' => 'team', 'en' => $team];
             }
-            return ['type' => 'label',
-                    'label' => ($isWinner ? 'Sieger Spiel ' : 'Verlierer Spiel ') . $ref];
+            return ['type' => 'label', 'kind' => $isWinner ? 'winner_of' : 'loser_of', 'num' => $ref];
         }
 
         // Sonst: echtes Team (bereits aufgelöst durch die Quelle).
         if (self::isRealTeam($token)) {
             return ['type' => 'team', 'en' => $token];
         }
-        return ['type' => 'label', 'label' => $token];
+        return ['type' => 'label', 'kind' => 'raw', 'label' => $token];
     }
 
     /** Sieger/Verlierer eines (beendeten) Spiels als echtes Team, sonst null. */
@@ -129,11 +190,9 @@ final class BracketService
         $s1 = (int) $m['score1'];
         $s2 = (int) $m['score2'];
         if ($s1 === $s2) {
-            return null; // Unentschieden in KO -> Sieger steht hier nicht fest (Elfmeter)
+            return null; // Unentschieden -> Sieger steht hier nicht fest (Elfmeter)
         }
-        $home = self::isRealTeam($m['team1']);
-        $away = self::isRealTeam($m['team2']);
-        if (!$home || !$away) {
+        if (!self::isRealTeam($m['team1']) || !self::isRealTeam($m['team2'])) {
             return null;
         }
         $homeWon = $s1 > $s2;
@@ -143,7 +202,6 @@ final class BracketService
     /** Heuristik: ein echter Teamname ist KEIN Platzhalter-Code. */
     private static function isRealTeam(string $token): bool
     {
-        // Platzhalter: 1A, 2B, 3A/B/.., W73, L101
         if (preg_match('#^[123][A-L]#', $token) || preg_match('/^[WL]\d+$/', $token)) {
             return false;
         }

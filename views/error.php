@@ -3,5 +3,5 @@
     <div class="empty-ico"><?= (int) $code === 404 ? '🔍' : '⚠️' ?></div>
     <h1 class="page-title"><?= (int) $code ?></h1>
     <p><?= e($message) ?></p>
-    <a class="btn btn-primary" href="<?= e(url('/dashboard')) ?>">Zur Startseite</a>
+    <a class="btn btn-primary" href="<?= e(url('/dashboard')) ?>"><?= e(t('error.home')) ?></a>
 </div>

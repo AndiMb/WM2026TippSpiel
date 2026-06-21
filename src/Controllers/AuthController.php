@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\Auth;
+use App\Core\Lang;
 use App\Core\Session;
 use App\Core\View;
 
@@ -14,7 +15,7 @@ final class AuthController
         if (Auth::check()) {
             redirect('/dashboard');
         }
-        View::render('auth/login', [], 'Anmelden');
+        View::render('auth/login', [], t('login.submit'));
     }
 
     public function login(): void
@@ -23,16 +24,22 @@ final class AuthController
         $password = (string) ($_POST['password'] ?? '');
 
         if ($username === '' || $password === '') {
-            Session::flash('error', 'Bitte Benutzername und Passwort eingeben.');
+            Session::flash('error', t('flash.login_empty'));
             redirect('/login');
         }
 
         if (Auth::attempt($username, $password)) {
-            Session::flash('success', 'Willkommen zurück!');
+            // Begrüßung gleich in der Sprache des Benutzers anzeigen.
+            $u = Auth::user();
+            if (!empty($u['locale'])) {
+                $_SESSION['locale'] = $u['locale'];
+                Lang::init($u['locale']);
+            }
+            Session::flash('success', t('flash.login_ok'));
             redirect('/dashboard');
         }
 
-        Session::flash('error', 'Benutzername oder Passwort ist falsch.');
+        Session::flash('error', t('flash.login_fail'));
         redirect('/login');
     }
 

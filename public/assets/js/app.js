@@ -34,4 +34,53 @@
             setTimeout(function () { el.remove(); }, 400);
         }, 4000);
     });
+
+    // Turnierbaum: Runden-Tabs zum stufenweisen Springen + aktive Runde markieren.
+    var bracket = document.getElementById('bracket');
+    var tabs = document.getElementById('round-tabs');
+    if (bracket && tabs) {
+        var rounds = bracket.querySelectorAll('.bracket-round');
+        var tabBtns = tabs.querySelectorAll('.round-tab');
+
+        function setActive(idx) {
+            tabBtns.forEach(function (b) {
+                b.classList.toggle('is-active', parseInt(b.dataset.idx, 10) === idx);
+            });
+        }
+
+        // Klick auf einen Tab: passende Runde einrasten lassen.
+        // getBoundingClientRect ist robust unabhängig vom offsetParent.
+        tabBtns.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var idx = parseInt(btn.dataset.idx, 10);
+                var target = rounds[idx];
+                if (target) {
+                    // Direktes Setzen (kein 'smooth') – verträgt sich mit
+                    // scroll-snap: mandatory und rastet sauber auf die Runde.
+                    var delta = target.getBoundingClientRect().left - bracket.getBoundingClientRect().left;
+                    bracket.scrollLeft = bracket.scrollLeft + delta;
+                    setActive(idx);
+                }
+            });
+        });
+
+        // Beim Scrollen die aktuell sichtbare Runde als aktiv markieren.
+        var ticking = false;
+        bracket.addEventListener('scroll', function () {
+            if (ticking) return;
+            ticking = true;
+            window.requestAnimationFrame(function () {
+                var bRect = bracket.getBoundingClientRect();
+                var center = bRect.left + bracket.clientWidth / 2;
+                var best = 0, bestDist = Infinity;
+                rounds.forEach(function (r, i) {
+                    var rRect = r.getBoundingClientRect();
+                    var d = Math.abs((rRect.left + rRect.width / 2) - center);
+                    if (d < bestDist) { bestDist = d; best = i; }
+                });
+                setActive(best);
+                ticking = false;
+            });
+        }, { passive: true });
+    }
 })();

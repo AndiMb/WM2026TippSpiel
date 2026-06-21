@@ -4,10 +4,11 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Core\Database as DB;
+use App\Core\Lang;
 
 /**
  * Mannschafts-Informationen:
- *   - deutscher Anzeigename + FIFA-Rang (aus Tabelle `teams`, Fallback: Datei)
+ *   - Anzeigename (de/pt) + FIFA-Rang (aus Tabelle `teams`, Fallback: Datei)
  *   - letztes Spielergebnis je Team (abgeleitet aus den eigenen Spieldaten)
  *
  * Die Stammdaten stammen aus src/Data/teams.php und werden per syncFromData()
@@ -15,7 +16,7 @@ use App\Core\Database as DB;
  */
 final class TeamService
 {
-    /** @var array<string,array{de:string,rank:?int,code:?string}>|null */
+    /** @var array<string,array{de:string,pt:?string,rank:?int,code:?string}>|null */
     private static ?array $map = null;
 
     /** Rohdaten aus der PHP-Datei. */
@@ -34,18 +35,19 @@ final class TeamService
 
         // Bevorzugt aus der DB (erlaubt spätere Anpassungen durch den Admin).
         try {
-            foreach (DB::all('SELECT name_en, name_de, fifa_rank, code FROM teams') as $r) {
+            foreach (DB::all('SELECT name_en, name_de, name_pt, fifa_rank, code FROM teams') as $r) {
                 self::$map[$r['name_en']] = [
                     'de'   => $r['name_de'],
+                    'pt'   => $r['name_pt'] ?? null,
                     'rank' => $r['fifa_rank'] !== null ? (int) $r['fifa_rank'] : null,
                     'code' => $r['code'],
                 ];
             }
         } catch (\Throwable $e) {
-            // Tabelle existiert evtl. noch nicht (vor der Migration) -> ignorieren.
+            // Tabelle existiert evtl. noch nicht (oder ohne name_pt) -> Datei nutzen.
         }
 
-        // Fallback / Auffüllen aus der Datei (falls DB leer oder Team fehlt).
+        // Fallback / Auffüllen aus der Datei (falls DB leer oder Spalte fehlt).
         if (!self::$map) {
             self::$map = self::data();
         }
@@ -53,11 +55,28 @@ final class TeamService
         return self::$map;
     }
 
-    /** Deutscher Anzeigename; unbekannte Teams bleiben im Original. */
+    /**
+     * Anzeigename in der gewünschten Sprache (Standard: aktuelle Sprache).
+     * Reihenfolge: gewählte Sprache -> Deutsch -> englischer Originalname.
+     */
+    public static function name(string $en, ?string $locale = null): string
+    {
+        $locale = $locale ?? Lang::locale();
+        $m = self::map();
+        if (!isset($m[$en])) {
+            return $en;
+        }
+        $info = $m[$en];
+        if ($locale !== 'de' && !empty($info[$locale])) {
+            return $info[$locale];
+        }
+        return $info['de'] ?? $en;
+    }
+
+    /** Deutscher Anzeigename (für Kontexte ohne Sprachbezug). */
     public static function nameDe(string $en): string
     {
-        $m = self::map();
-        return $m[$en]['de'] ?? $en;
+        return self::name($en, 'de');
     }
 
     /** FIFA-Weltranglistenplatz oder null. */
@@ -132,13 +151,13 @@ final class TeamService
         $count = 0;
         foreach (self::data() as $en => $info) {
             $updated = DB::run(
-                'UPDATE teams SET name_de = ?, fifa_rank = ?, code = ?, updated_at = ? WHERE name_en = ?',
-                [$info['de'], $info['rank'] ?? null, $info['code'] ?? null, DB::now(), $en]
+                'UPDATE teams SET name_de = ?, name_pt = ?, fifa_rank = ?, code = ?, updated_at = ? WHERE name_en = ?',
+                [$info['de'], $info['pt'] ?? null, $info['rank'] ?? null, $info['code'] ?? null, DB::now(), $en]
             );
             if ($updated === 0) {
                 DB::run(
-                    'INSERT INTO teams (name_en, name_de, fifa_rank, code, updated_at) VALUES (?, ?, ?, ?, ?)',
-                    [$en, $info['de'], $info['rank'] ?? null, $info['code'] ?? null, DB::now()]
+                    'INSERT INTO teams (name_en, name_de, name_pt, fifa_rank, code, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
+                    [$en, $info['de'], $info['pt'] ?? null, $info['rank'] ?? null, $info['code'] ?? null, DB::now()]
                 );
             }
             $count++;

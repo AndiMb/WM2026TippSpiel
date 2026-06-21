@@ -26,6 +26,17 @@ use App\Controllers\Admin\SettingsController;
 
 Session::start(config());
 
+// Sprache bestimmen: ?lang= (Umschalter auf der Login-Seite) -> Session
+// -> Einstellung des eingeloggten Benutzers -> Standardsprache.
+if (isset($_GET['lang'])) {
+    $_SESSION['locale'] = \App\Core\Lang::normalize((string) $_GET['lang']);
+}
+$currentUser = \App\Core\Auth::user();
+$locale = !empty($currentUser['locale'])
+    ? $currentUser['locale']
+    : ($_SESSION['locale'] ?? \App\Core\Lang::DEFAULT);
+\App\Core\Lang::init($locale);
+
 $router = new Router();
 
 // --- Öffentlich --------------------------------------------------------
@@ -52,6 +63,7 @@ $router->get('/tipps',     [TipsController::class, 'index']);
 $router->get('/konto',         [AccountController::class, 'index']);
 $router->post('/konto/passwort',[AccountController::class, 'changePassword']);
 $router->post('/konto/bonus',  [AccountController::class, 'saveBonus']);
+$router->post('/konto/sprache',[AccountController::class, 'saveLanguage']);
 
 // --- Admin -------------------------------------------------------------
 $router->get('/admin',                 [AdminController::class, 'index']);

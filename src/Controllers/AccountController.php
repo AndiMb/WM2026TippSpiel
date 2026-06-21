@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\Auth;
+use App\Core\Lang;
 use App\Core\Session;
 use App\Core\View;
 use App\Models\BonusQuestion;
@@ -24,7 +25,8 @@ final class AccountController
             'bonusEnabled'  => $bonusEnabled,
             'bonusQuestions'=> $bonusEnabled ? BonusQuestion::active() : [],
             'bonusAnswers'  => $bonusEnabled ? BonusQuestion::answersForUser($uid) : [],
-        ], 'Mein Konto');
+            'languages'     => Lang::SUPPORTED,
+        ], t('account.title'));
     }
 
     public function changePassword(): void
@@ -38,20 +40,35 @@ final class AccountController
         $confirm = (string) ($_POST['confirm'] ?? '');
 
         if (!password_verify($current, $me['password_hash'])) {
-            Session::flash('error', 'Aktuelles Passwort ist falsch.');
+            Session::flash('error', t('flash.pw_wrong'));
             redirect('/konto');
         }
         if (strlen($new) < 6) {
-            Session::flash('error', 'Neues Passwort muss mindestens 6 Zeichen haben.');
+            Session::flash('error', t('flash.pw_short'));
             redirect('/konto');
         }
         if ($new !== $confirm) {
-            Session::flash('error', 'Die Passwörter stimmen nicht überein.');
+            Session::flash('error', t('flash.pw_mismatch'));
             redirect('/konto');
         }
 
         User::updatePassword($uid, $new);
-        Session::flash('success', 'Passwort geändert.');
+        Session::flash('success', t('flash.pw_changed'));
+        redirect('/konto');
+    }
+
+    /** Anzeigesprache des Benutzers ändern. */
+    public function saveLanguage(): void
+    {
+        Auth::requireLogin();
+        $uid = Auth::id();
+
+        $locale = Lang::normalize((string) ($_POST['locale'] ?? Lang::DEFAULT));
+        User::updateLocale($uid, $locale);
+        $_SESSION['locale'] = $locale;          // sofort wirksam
+        Lang::init($locale);                    // Flash gleich in neuer Sprache
+
+        Session::flash('success', t('flash.lang_saved'));
         redirect('/konto');
     }
 
@@ -86,7 +103,7 @@ final class AccountController
             }
         }
 
-        Session::flash('success', $saved > 0 ? 'Bonus-Tipps gespeichert.' : 'Keine Änderungen.');
+        Session::flash('success', $saved > 0 ? t('flash.bonus_saved') : t('flash.no_change'));
         redirect('/konto');
     }
 }
