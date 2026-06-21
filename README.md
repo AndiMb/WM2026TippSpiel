@@ -15,11 +15,17 @@ App-Installation.
 
 * **Kinderleichte Bedienung** – große Buttons, große Zahlenfelder, klare
   Sprache. Auch für Kinder ab 9 Jahren problemlos nutzbar.
-* **Deutsche Ländernamen + Flaggen** – automatische Übersetzung der englischen
-  Quelldaten und lokale SVG-Flaggen (anpassbar in `src/Data/teams.php`), damit
-  auch Lese-Anfänger die Mannschaften erkennen. Keine externen Server zur Laufzeit.
+* **Mehrsprachig (Deutsch / Portugiesisch)** – Sprache je Benutzer wählbar
+  (Konto → Sprache) mit Umschalter auf der Login-Seite; inkl. übersetzter
+  Ländernamen.
+* **Ländernamen + Flaggen** – Mannschaftsnamen in der gewählten Sprache und
+  lokale SVG-Flaggen (anpassbar in `src/Data/teams.php`), damit auch
+  Lese-Anfänger die Teams erkennen. Keine externen Server zur Laufzeit.
 * **Tipphilfen** – pro Mannschaft FIFA-Weltranglistenplatz und letztes
   Spielergebnis, damit auch Kinder Anhaltspunkte für ihren Tipp haben.
+* **Gruppen & Turnierbaum** – Live-Gruppentabellen, beste Gruppendritte und ein
+  KO-Turnierbaum mit Runden-Tabs und stufenweisem Wischen (Handy). Das
+  Sechzehntelfinale zeigt die Paarungen laut aktuellem Tabellenstand.
 * **Tipps der anderen** – Übersicht aller Mitspieler-Tipps, fair erst **nach
   Anpfiff** sichtbar.
 * **Sichere Updates** – versioniertes Migrationssystem; bestehende Daten bleiben
@@ -53,8 +59,9 @@ App-Installation.
 |---------|--------|
 | 🏠 **Start** | Dashboard mit Überblick |
 | ✏️ **Tippen** | Kommende Spiele tippen |
-| 🏆 **Rangliste** | Aktuelle Tabelle |
-| 👤 **Konto** | Profil, Passwort, Bonus-Tipps |
+| 🏟️ **Turnier** | Gruppentabellen & KO-Turnierbaum |
+| 🏆 **Rangliste** | Aktuelle Tabelle (+ „Tipps der anderen") |
+| 👤 **Konto** | Profil, Sprache, Passwort, Bonus-Tipps |
 | ⚙️ **Admin** | nur für Administratoren |
 
 ---
@@ -104,20 +111,22 @@ tippspiel/
 │   └── assets/             # CSS, JS, Bilder
 ├── src/
 │   ├── bootstrap.php       # Autoloader, Config, DB-Init
-│   ├── helpers.php         # globale Hilfsfunktionen (url, e, csrf …)
-│   ├── Core/               # Database, Router, Auth, Session, Csrf, View
+│   ├── helpers.php         # globale Hilfsfunktionen (url, e, csrf, t, tname, flag …)
+│   ├── Core/               # Database, Router, Auth, Session, Csrf, View, Lang
 │   ├── Models/             # User, MatchModel, Bet, Setting, BonusQuestion
 │   ├── Services/           # Scoring, Standings, Schedule/Result-Import,
-│   │                       #   TeamService (Namen/Rang), TipsService
-│   ├── Data/               # teams.php (DE-Namen + FIFA-Rang)
-│   └── Controllers/        # Auth/Dashboard/Bet/Standings/Tips/Account + Admin/*
-├── views/                  # PHP-Templates (Layout + Seiten)
+│   │                       #   TeamService, TipsService, GroupsService, BracketService
+│   ├── Data/               # teams.php (DE/PT-Namen, FIFA-Rang, ISO-Code)
+│   ├── Lang/               # Übersetzungen de.php / pt.php
+│   └── Controllers/        # Auth/Dashboard/Bet/Standings/Tips/Tournament/
+│                           #   Account/Legal + Admin/*
+├── views/                  # PHP-Templates (Layout + Seiten + legal/)
 ├── config/                 # config.example.php (Vorlage)
 ├── database/               # Schema (SQLite+MySQL), migrate.php, seed.php
-│   └── migrations/         # versionierte Migrationen (002_teams.sql …)
+│   └── migrations/         # versionierte Migrationen (002_teams … 004_i18n)
 ├── bin/                    # Cron-/Pflege-Skripte (Import, Ergebnisse, Teams)
 ├── data/                   # SQLite-DB + Importdateien (nicht öffentlich)
-├── INSTALL.md
+├── INSTALL.md   UPDATE.md   RECHTLICHES.md
 └── README.md
 ```
 
@@ -161,6 +170,18 @@ Damit funktioniert das Tippspiel auch dann, wenn keine API erreichbar ist.
   die Session-ID wird beim Login erneuert.
 * Sämtliche Ausgaben werden per `e()` HTML-escaped, alle Eingaben serverseitig
   validiert; Datenbankzugriffe ausschließlich über vorbereitete Statements.
+
+---
+
+## ⚖️ Rechtliches
+
+Vorbereitet sind **Impressum** (`/impressum`) und **Datenschutzerklärung**
+(`/datenschutz`), beide ohne Login erreichbar; die Betreiberangaben werden unter
+**Admin → Einstellungen → Rechtliches** gepflegt. Eine Einschätzung (Impressum,
+DSGVO, Glücksspiel, Marken) steht in **[RECHTLICHES.md](RECHTLICHES.md)**.
+
+Flaggen stammen aus dem Set [flag-icons](https://github.com/lipis/flag-icons)
+(MIT); die abgebildeten Nationalflaggen sind gemeinfrei.
 
 ---
 

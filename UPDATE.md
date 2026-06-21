@@ -128,11 +128,14 @@ php bin/import_schedule.php
 ## 6. Prüfen
 
 1. Seite im Browser öffnen und einloggen.
-2. **Spiele tippen** öffnen – Ländernamen sind deutsch, jede Mannschaft hat eine
-   **Flagge**, darunter FIFA-Rang und letztes Ergebnis.
+2. **Spiele tippen** öffnen – Ländernamen erscheinen übersetzt (Sprache laut
+   Konto), jede Mannschaft hat eine **Flagge**, darunter FIFA-Rang und letztes
+   Ergebnis.
 3. **Turnier** öffnen – Gruppentabellen und KO-Turnierbaum (Sechzehntelfinale
    zeigt die Plätze laut aktuellem Tabellenstand).
 4. **Rangliste → „Tipps der anderen"** öffnen.
+5. **Konto → Sprache** auf „Português" umstellen und prüfen, dass die Oberfläche
+   übersetzt erscheint.
 
 Fertig. Falls etwas klemmt, Backup zurückspielen:
 
@@ -146,13 +149,11 @@ cp data/tippspiel.backup-XXXX.sqlite data/tippspiel.sqlite
 
 | Neu | Beschreibung |
 |-----|--------------|
-| 🇩🇪 **Deutsche Ländernamen** | Übersetzung über `src/Data/teams.php` (anpassbar). |
-| 🏴 **Flaggen** | Lokale SVG-Flaggen je Mannschaft (`public/assets/img/flags/`), keine externen Server. |
+| 🌐 **Mehrsprachig (DE/PT)** | Sprache je Benutzer (Konto → Sprache), Umschalter auf der Login-Seite; übersetzte Oberfläche **und** Ländernamen. |
+| 🏴 **Ländernamen + Flaggen** | Lokale SVG-Flaggen je Mannschaft (`public/assets/img/flags/`), Namen in DE/PT – keine externen Server. |
 | 📊 **Team-Infos beim Tippen** | FIFA-Weltranglistenplatz + letztes Spielergebnis je Mannschaft. |
-| 🏟️ **Gruppen & Turnierbaum** | Gruppentabellen, beste Gruppendritte und KO-Baum (`/turnier`). |
+| 🏟️ **Gruppen & Turnierbaum** | Gruppentabellen, beste Gruppendritte und KO-Baum mit Runden-Tabs und stufenweisem Wischen (`/turnier`). |
 | 👀 **Tipps der anderen** | Übersicht aller Tipps – erst **nach Anpfiff** sichtbar. |
-| 🌐 **Mehrsprachig (DE/PT)** | Sprache je Benutzer wählbar (Konto → Sprache); Umschalter auf der Login-Seite. |
-| 🗂️ **Gruppen & Turnierbaum** | Gruppentabellen + KO-Baum mit Runden-Tabs und stufenweisem Wischen. |
 | 🔁 **Migrationssystem** | Sichere, datenerhaltende Updates (`schema_migrations`). |
 
 ### FIFA-Ränge anpassen

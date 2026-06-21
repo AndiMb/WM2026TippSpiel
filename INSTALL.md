@@ -211,9 +211,13 @@ Pfad zur PHP-CLI ermitteln: `which php`.
 
 1. Als `admin` einloggen und **Passwort ändern**.
 2. Unter **Admin → Einstellungen** das Punktesystem und die **Nachhol-Regel**
-   (Variante A oder B) festlegen.
-3. **Spielplan importieren** (Abschnitt 6).
-4. Unter **Admin → Benutzer** für jedes Familienmitglied einen Account anlegen.
+   (Variante A oder B) festlegen sowie unter **Rechtliches** die Betreiberangaben
+   für Impressum/Datenschutz eintragen (siehe **[RECHTLICHES.md](RECHTLICHES.md)**).
+3. **Spielplan importieren** (Abschnitt 6). Damit der **Turnierbaum** vollständig
+   erscheint, ist mindestens ein Import nötig (füllt die Spielnummern).
+4. Unter **Admin → Benutzer** für jedes Familienmitglied einen Account anlegen –
+   dabei je Person die **Sprache** (Deutsch/Português) wählbar. Jeder kann seine
+   Sprache später selbst unter **Konto → Sprache** ändern.
 5. Fertig – die Mitspieler können sich anmelden und tippen.
 
 ---

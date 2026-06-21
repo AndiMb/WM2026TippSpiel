@@ -55,6 +55,10 @@ die rechtliche Belastung gering. Die App ist bewusst datensparsam gebaut:
   um keine offizielle Verbindung zu suggerieren. Impressum enthält einen
   entsprechenden **Distanzierungs-Hinweis**.
 * Spieldaten von **OpenFootball** stehen in der Public Domain.
+* Die **Flaggen-Grafiken** stammen aus dem Set
+  [flag-icons](https://github.com/lipis/flag-icons) (MIT-Lizenz); die
+  abgebildeten Nationalflaggen sind gemeinfrei. Sie liegen lokal vor
+  (`public/assets/img/flags/`) – kein externer Server zur Laufzeit.
 
 ## 5. Sicherheit (unterstützt den Datenschutz)
 
