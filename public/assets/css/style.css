@@ -329,7 +329,13 @@ body {
 }
 .page-footer a { color: var(--muted); text-decoration: none; margin: 0 6px; }
 .page-footer a:hover { color: var(--ink); text-decoration: underline; }
-.login-legal { margin-top: 18px; text-align: center; font-size: 14px; }
+.lang-switch { margin-top: 18px; display: flex; gap: 8px; justify-content: center; }
+.lang-switch a {
+    text-decoration: none; color: var(--ink); border: 2px solid var(--border);
+    border-radius: 999px; padding: 6px 12px; font-size: 14px; font-weight: 700;
+}
+.lang-switch a.is-active { background: var(--green-light); border-color: var(--green); color: var(--green-dark); }
+.login-legal { margin-top: 14px; text-align: center; font-size: 14px; }
 .login-legal a { color: var(--muted); text-decoration: none; margin: 0 6px; }
 .legal-text { line-height: 1.6; }
 .legal-text h2 { font-size: 18px; margin: 18px 0 6px; }
@@ -364,28 +370,62 @@ body {
 .legend .dot.q-third { background: #fff7e3; border: 1px solid #f3d191; }
 
 /* ---------- Turnier: Turnierbaum ---------- */
-.bracket-scroll { overflow-x: auto; max-width: 100%; padding-bottom: 8px; -webkit-overflow-scrolling: touch; }
+/* Runden-Tabs (stufenweises Durchblättern) */
+.round-tabs {
+    display: flex; gap: 6px; overflow-x: auto; padding: 4px 0 10px;
+    -webkit-overflow-scrolling: touch;
+}
+.round-tab {
+    flex: 0 0 auto; border: 2px solid var(--border); background: #fff; color: var(--ink);
+    border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 700;
+    cursor: pointer; min-height: 40px; white-space: nowrap;
+}
+.round-tab.is-active { background: var(--green); border-color: var(--green); color: #fff; }
+
+/* Bracket: horizontal mit Snap – jede Runde rastet vollständig im Bild ein */
+.bracket-scroll {
+    overflow-x: auto; max-width: 100%; padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    scroll-padding-left: 0;
+}
 .bracket { display: flex; gap: 14px; min-width: min-content; }
-.bracket-round { flex: 0 0 auto; width: 210px; }
+.bracket-round {
+    flex: 0 0 auto;
+    /* Auf dem Handy füllt eine Runde nahezu die Breite; nie breiter als 300px. */
+    width: min(86vw, 300px);
+    scroll-snap-align: start;
+}
 .round-title {
     font-size: 14px; margin: 0 0 10px; text-align: center;
     background: var(--green); color: #fff; padding: 6px; border-radius: 10px;
+    position: sticky; top: 0;
 }
 .ko-match {
     background: var(--card); border: 1px solid var(--border); border-radius: 12px;
     padding: 8px 10px; margin-bottom: 10px; box-shadow: var(--shadow);
 }
-.ko-num { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+.ko-num { font-size: 11px; color: var(--muted); margin-bottom: 4px; font-weight: 700; }
 .ko-side {
     display: flex; align-items: center; justify-content: space-between; gap: 6px;
-    padding: 3px 0;
+    padding: 4px 0;
 }
 .ko-side + .ko-side { border-top: 1px dashed var(--border); }
 .ko-team { flex: 1 1 auto; min-width: 0; font-weight: 700; font-size: 14px; line-height: 1.25; overflow-wrap: anywhere; }
 .ko-score { flex: 0 0 auto; font-weight: 800; font-variant-numeric: tabular-nums; min-width: 1.2em; text-align: right; }
-.ko-meta { font-size: 11px; color: var(--muted); margin-top: 5px; }
+.ko-meta { font-size: 11px; color: var(--muted); margin-top: 5px; display: flex; justify-content: space-between; gap: 6px; flex-wrap: wrap; }
+.ko-advance { color: var(--blue); font-weight: 700; }
 .slot-label { font-weight: 600; color: var(--muted); font-style: italic; }
 .proj { color: var(--blue); font-weight: 700; font-size: .85em; }
+
+/* Spiel um Platz 3 (separat unter dem Baum) */
+.third-place { margin-top: 16px; max-width: 320px; }
+.round-title-third { background: var(--muted); }
+
+/* Größere Bildschirme: schmalere Runden, mehrere gleichzeitig sichtbar */
+@media (min-width: 720px) {
+    .bracket-round { width: 240px; }
+}
 
 /* ---------- Barrierefreiheit ---------- */
 @media (prefers-reduced-motion: reduce) {

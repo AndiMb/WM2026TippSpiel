@@ -75,7 +75,7 @@ final class Auth
     public static function requireLogin(): void
     {
         if (!self::check()) {
-            Session::flash('error', 'Bitte zuerst anmelden.');
+            Session::flash('error', t('flash.login_required'));
             redirect('/login');
         }
         // Falls der Benutzer in der Zwischenzeit gelöscht/gesperrt wurde:

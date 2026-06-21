@@ -27,6 +27,13 @@
                 <option value="admin">Administrator</option>
             </select>
         </label>
+        <label class="field">
+            <span class="field-label">Sprache</span>
+            <select class="input" name="locale">
+                <option value="de">Deutsch</option>
+                <option value="pt">Português</option>
+            </select>
+        </label>
         <div class="field field-full">
             <button class="btn btn-primary" type="submit">Benutzer anlegen</button>
         </div>
@@ -53,6 +60,13 @@
                         <select class="input" name="role">
                             <option value="player" <?= $u['role'] === 'player' ? 'selected' : '' ?>>Spieler</option>
                             <option value="admin"  <?= $u['role'] === 'admin'  ? 'selected' : '' ?>>Administrator</option>
+                        </select>
+                    </label>
+                    <label class="field">
+                        <span class="field-label">Sprache</span>
+                        <select class="input" name="locale">
+                            <option value="de" <?= ($u['locale'] ?? 'de') === 'de' ? 'selected' : '' ?>>Deutsch</option>
+                            <option value="pt" <?= ($u['locale'] ?? 'de') === 'pt' ? 'selected' : '' ?>>Português</option>
                         </select>
                     </label>
                     <label class="check">

@@ -1,25 +1,67 @@
 <?php /** @var array $groups @var array $bestThirds @var array $bracket */ ?>
 <?php
-/** Kleiner Helfer: ein aufgelöstes Bracket-Team anzeigen (Flagge + Name oder Label). */
-$slot = function (array $t): string {
-    if (($t['type'] ?? '') === 'team' && !empty($t['en'])) {
-        $html = flag($t['en']) . ' ' . e(tname($t['en']));
-        if (!empty($t['proj'])) {
-            $html .= ' <span class="proj" title="laut aktuellem Tabellenstand">(vorauss.)</span>';
+/** Ein aufgelöstes Bracket-Team anzeigen (Flagge + Name oder übersetztes Label). */
+$slot = function (array $tm): string {
+    if (($tm['type'] ?? '') === 'team' && !empty($tm['en'])) {
+        $html = flag($tm['en']) . ' ' . e(tname($tm['en']));
+        if (!empty($tm['proj'])) {
+            $html .= ' <span class="proj">' . e(t('tour.proj')) . '</span>';
         }
         return $html;
     }
-    return '<span class="slot-label">' . e($t['label'] ?? '?') . '</span>';
+    // Label je nach Art übersetzen
+    switch ($tm['kind'] ?? 'raw') {
+        case 'group_winner': $txt = t('tour.group_winner', ['grp' => $tm['grp']]); break;
+        case 'group_second': $txt = t('tour.group_second', ['grp' => $tm['grp']]); break;
+        case 'group_third':  $txt = t('tour.group_third', ['grps' => $tm['grps']]); break;
+        case 'winner_of':    $txt = t('tour.winner_of', ['num' => $tm['num']]); break;
+        case 'loser_of':     $txt = t('tour.loser_of', ['num' => $tm['num']]); break;
+        default:             $txt = $tm['label'] ?? '?';
+    }
+    return '<span class="slot-label">' . e($txt) . '</span>';
+};
+
+// Spiel um Platz 3 aus dem Hauptbaum herauslösen (separat anzeigen).
+$mainRounds = [];
+$thirdPlace = null;
+foreach ($bracket as $round) {
+    if ($round['name'] === 'Match for third place') {
+        $thirdPlace = $round['matches'][0] ?? null;
+    } else {
+        $mainRounds[] = $round;
+    }
+}
+
+$renderMatch = function (array $bm) use ($slot): string {
+    ob_start(); ?>
+    <div class="ko-match">
+        <?php if ($bm['num']): ?><div class="ko-num"><?= e(t('tour.match', ['num' => $bm['num']])) ?></div><?php endif; ?>
+        <div class="ko-side">
+            <span class="ko-team"><?= $slot($bm['team1']) ?></span>
+            <span class="ko-score"><?= $bm['score1'] !== null ? (int) $bm['score1'] : '' ?></span>
+        </div>
+        <div class="ko-side">
+            <span class="ko-team"><?= $slot($bm['team2']) ?></span>
+            <span class="ko-score"><?= $bm['score2'] !== null ? (int) $bm['score2'] : '' ?></span>
+        </div>
+        <div class="ko-meta">
+            <?= e(fmt_datetime($bm['kickoff'], 'd.m. H:i')) ?>
+            <?php if (!empty($bm['advances_to'])): ?>
+                <span class="ko-advance"><?= e(t('tour.advances', ['num' => $bm['advances_to']])) ?></span>
+            <?php endif; ?>
+        </div>
+    </div>
+    <?php return (string) ob_get_clean();
 };
 ?>
 
-<h1 class="page-title">🏟️ Gruppen &amp; Turnierbaum</h1>
+<h1 class="page-title"><?= e(t('tour.title')) ?></h1>
 
 <!-- ===================== Gruppentabellen ===================== -->
 <section class="section">
-    <h2 class="section-title">Gruppentabellen</h2>
+    <h2 class="section-title"><?= e(t('tour.groups')) ?></h2>
     <?php if (!$groups): ?>
-        <p class="muted">Noch keine Gruppenspiele vorhanden.</p>
+        <p class="muted"><?= e(t('tour.no_groups')) ?></p>
     <?php else: ?>
     <div class="group-grid">
         <?php foreach ($groups as $g): ?>
@@ -28,10 +70,10 @@ $slot = function (array $t): string {
                 <table class="table group-table">
                     <thead>
                         <tr>
-                            <th>#</th><th>Team</th>
-                            <th class="num" title="Spiele">Sp</th>
-                            <th class="num" title="Tordifferenz">Diff</th>
-                            <th class="num" title="Punkte">Pkt</th>
+                            <th>#</th><th><?= e(t('tour.col_team')) ?></th>
+                            <th class="num"><?= e(t('tour.col_played')) ?></th>
+                            <th class="num"><?= e(t('tour.col_diff')) ?></th>
+                            <th class="num"><?= e(t('tour.col_points')) ?></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -51,8 +93,8 @@ $slot = function (array $t): string {
         <?php endforeach; ?>
     </div>
     <p class="legend muted">
-        <span class="dot q-top"></span> Platz 1–2 (weiter) ·
-        <span class="dot q-third"></span> Platz 3 (evtl. weiter als bester Dritter)
+        <span class="dot q-top"></span> <?= e(t('tour.legend_top')) ?> ·
+        <span class="dot q-third"></span> <?= e(t('tour.legend_third')) ?>
     </p>
     <?php endif; ?>
 </section>
@@ -60,18 +102,18 @@ $slot = function (array $t): string {
 <!-- ===================== Beste Gruppendritte ===================== -->
 <?php if ($bestThirds): ?>
 <section class="section">
-    <h2 class="section-title">Beste Gruppendritte <span class="muted">(8 kommen weiter)</span></h2>
+    <h2 class="section-title"><?= e(t('tour.best_thirds')) ?> <span class="muted"><?= e(t('tour.best_thirds_note')) ?></span></h2>
     <div class="card">
         <table class="table">
-            <thead><tr><th>#</th><th>Gruppe</th><th>Team</th><th class="num">Diff</th><th class="num">Pkt</th></tr></thead>
+            <thead><tr><th>#</th><th><?= e(t('tour.col_group')) ?></th><th><?= e(t('tour.col_team')) ?></th><th class="num"><?= e(t('tour.col_diff')) ?></th><th class="num"><?= e(t('tour.col_points')) ?></th></tr></thead>
             <tbody>
-            <?php foreach ($bestThirds as $i => $t): ?>
-                <tr class="<?= $t['qualified'] ? 'q-top' : '' ?>">
+            <?php foreach ($bestThirds as $i => $tm): ?>
+                <tr class="<?= $tm['qualified'] ? 'q-top' : '' ?>">
                     <td class="pos"><?= $i + 1 ?></td>
-                    <td><?= e(str_replace('Group ', '', $t['group'])) ?></td>
-                    <td class="t"><?= flag($t['team']) ?> <?= e(tname($t['team'])) ?></td>
-                    <td class="num"><?= ($t['gd'] > 0 ? '+' : '') . (int) $t['gd'] ?></td>
-                    <td class="num"><strong><?= (int) $t['pts'] ?></strong></td>
+                    <td><?= e(str_replace('Group ', '', $tm['group'])) ?></td>
+                    <td class="t"><?= flag($tm['team']) ?> <?= e(tname($tm['team'])) ?></td>
+                    <td class="num"><?= ($tm['gd'] > 0 ? '+' : '') . (int) $tm['gd'] ?></td>
+                    <td class="num"><strong><?= (int) $tm['pts'] ?></strong></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
@@ -82,36 +124,39 @@ $slot = function (array $t): string {
 
 <!-- ===================== Turnierbaum (KO) ===================== -->
 <section class="section">
-    <h2 class="section-title">Turnierbaum (KO-Phase)</h2>
-    <?php if (!$bracket): ?>
-        <p class="muted">Der Turnierbaum erscheint, sobald die KO-Spiele importiert sind.</p>
+    <h2 class="section-title"><?= e(t('tour.bracket')) ?></h2>
+    <?php if (!$mainRounds): ?>
+        <p class="muted"><?= e(t('tour.bracket_empty')) ?></p>
     <?php else: ?>
-        <p class="muted intro">
-            Im Sechzehntelfinale werden die Gruppenplätze laut aktuellem
-            Tabellenstand angezeigt <span class="proj">(vorauss.)</span>.
-        </p>
-        <div class="bracket-scroll">
+        <p class="muted intro"><?= e(t('tour.bracket_intro')) ?></p>
+
+        <!-- Runden-Tabs zum stufenweisen Durchblättern -->
+        <div class="round-tabs" id="round-tabs" role="tablist">
+            <?php foreach ($mainRounds as $i => $round): ?>
+                <button type="button" class="round-tab<?= $i === 0 ? ' is-active' : '' ?>" data-idx="<?= $i ?>">
+                    <?= e(t('round.' . $round['name'])) ?>
+                </button>
+            <?php endforeach; ?>
+        </div>
+
+        <div class="bracket-scroll" id="bracket">
             <div class="bracket">
-                <?php foreach ($bracket as $round): ?>
-                    <div class="bracket-round">
-                        <h3 class="round-title"><?= e($round['title']) ?></h3>
+                <?php foreach ($mainRounds as $i => $round): ?>
+                    <div class="bracket-round" data-idx="<?= $i ?>">
+                        <h3 class="round-title"><?= e(t('round.' . $round['name'])) ?></h3>
                         <?php foreach ($round['matches'] as $bm): ?>
-                            <div class="ko-match">
-                                <?php if ($bm['num']): ?><div class="ko-num">Spiel <?= (int) $bm['num'] ?></div><?php endif; ?>
-                                <div class="ko-side">
-                                    <span class="ko-team"><?= $slot($bm['team1']) ?></span>
-                                    <span class="ko-score"><?= $bm['score1'] !== null ? (int) $bm['score1'] : '' ?></span>
-                                </div>
-                                <div class="ko-side">
-                                    <span class="ko-team"><?= $slot($bm['team2']) ?></span>
-                                    <span class="ko-score"><?= $bm['score2'] !== null ? (int) $bm['score2'] : '' ?></span>
-                                </div>
-                                <div class="ko-meta"><?= e(fmt_datetime($bm['kickoff'], 'd.m. H:i')) ?> Uhr</div>
-                            </div>
+                            <?= $renderMatch($bm) ?>
                         <?php endforeach; ?>
                     </div>
                 <?php endforeach; ?>
             </div>
         </div>
+
+        <?php if ($thirdPlace): ?>
+            <div class="third-place">
+                <h3 class="round-title round-title-third"><?= e(t('round.Match for third place')) ?></h3>
+                <?= $renderMatch($thirdPlace) ?>
+            </div>
+        <?php endif; ?>
     <?php endif; ?>
 </section>

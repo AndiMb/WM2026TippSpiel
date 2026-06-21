@@ -19,6 +19,6 @@ final class TournamentController
             'groups'     => GroupsService::standings(),
             'bestThirds' => GroupsService::bestThirds(),
             'bracket'    => BracketService::build(),
-        ], 'Gruppen & Turnierbaum');
+        ], t('nav.tournament'));
     }
 }

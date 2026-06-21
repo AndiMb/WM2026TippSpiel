@@ -83,10 +83,16 @@ function is_past(string $utcKickoff): bool
     return strtotime($utcKickoff . ' UTC') <= time();
 }
 
-/** Deutscher Anzeigename einer Mannschaft (Fallback: Originalname). */
+/** Übersetzten Text holen (siehe src/Lang). */
+function t(string $key, array $params = []): string
+{
+    return \App\Core\Lang::t($key, $params);
+}
+
+/** Anzeigename einer Mannschaft in der aktuellen Sprache (Fallback: Original). */
 function tname(?string $en): string
 {
-    return $en === null ? '' : \App\Services\TeamService::nameDe($en);
+    return $en === null ? '' : \App\Services\TeamService::name($en);
 }
 
 /**

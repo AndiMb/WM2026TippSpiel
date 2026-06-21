@@ -74,7 +74,7 @@ final class Router
         }
 
         http_response_code(404);
-        View::render('error', ['code' => 404, 'message' => 'Seite nicht gefunden.'], 'Nicht gefunden');
+        View::render('error', ['code' => 404, 'message' => t('error.not_found')], '404');
     }
 
     private function call($handler, array $params): void

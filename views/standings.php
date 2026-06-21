@@ -1,30 +1,30 @@
 <?php /** @var array $standings @var bool $bonusEnabled @var string $scoringMode @var int $meId */ ?>
 
-<h1 class="page-title">🏆 Rangliste</h1>
+<h1 class="page-title"><?= e(t('standings.title')) ?></h1>
 
-<a class="btn btn-small" href="<?= e(url('/tipps')) ?>">👀 Tipps der anderen ansehen</a>
+<a class="btn btn-small" href="<?= e(url('/tipps')) ?>"><?= e(t('standings.see_others')) ?></a>
 
 <p class="muted intro">
     <?php if ($scoringMode === 'since_join'): ?>
-        Gewertet werden nur Spiele ab deinem Beitritt.
+        <?= e(t('standings.intro_join')) ?>
     <?php else: ?>
-        Gewertet werden alle gespielten Spiele (verpasste Spiele = 0 Punkte).
+        <?= e(t('standings.intro_all')) ?>
     <?php endif; ?>
 </p>
 
 <?php if (!$standings): ?>
-    <p class="muted">Noch keine Wertung vorhanden.</p>
+    <p class="muted"><?= e(t('standings.none')) ?></p>
 <?php else: ?>
 <div class="table-scroll">
 <table class="table table-standings">
     <thead>
         <tr>
-            <th>#</th>
-            <th>Spieler</th>
-            <th class="num">Punkte</th>
-            <?php if ($bonusEnabled): ?><th class="num hide-sm">Bonus</th><?php endif; ?>
-            <th class="num">Exakt</th>
-            <th class="num">Tendenz</th>
+            <th><?= e(t('table.rank')) ?></th>
+            <th><?= e(t('table.player')) ?></th>
+            <th class="num"><?= e(t('table.points')) ?></th>
+            <?php if ($bonusEnabled): ?><th class="num hide-sm"><?= e(t('standings.col_bonus')) ?></th><?php endif; ?>
+            <th class="num"><?= e(t('standings.col_exact')) ?></th>
+            <th class="num"><?= e(t('standings.col_tendency')) ?></th>
         </tr>
     </thead>
     <tbody>
@@ -32,7 +32,7 @@
         $medal = ['1' => '🥇', '2' => '🥈', '3' => '🥉'][(string) $row['rank']] ?? ''; ?>
         <tr class="<?= $row['user_id'] === $meId ? 'me-row' : '' ?>">
             <td class="rank-cell"><?= $medal ?: (int) $row['rank'] ?></td>
-            <td><?= e($row['name']) ?><?= $row['user_id'] === $meId ? ' <span class="you-tag">(du)</span>' : '' ?></td>
+            <td><?= e($row['name']) ?><?= $row['user_id'] === $meId ? ' <span class="you-tag">' . e(t('standings.you')) . '</span>' : '' ?></td>
             <td class="num"><strong><?= (int) $row['points'] ?></strong></td>
             <?php if ($bonusEnabled): ?><td class="num hide-sm"><?= (int) $row['bonus_pts'] ?></td><?php endif; ?>
             <td class="num"><?= (int) $row['exact'] ?></td>
@@ -42,8 +42,5 @@
     </tbody>
 </table>
 </div>
-<p class="legend muted">
-    <strong>Exakt</strong> = genaues Ergebnis getroffen ·
-    <strong>Tendenz</strong> = richtige Tordifferenz/Sieger
-</p>
+<p class="legend muted"><?= t('standings.legend') ?></p>
 <?php endif; ?>

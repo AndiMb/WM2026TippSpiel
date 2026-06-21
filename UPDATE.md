@@ -87,6 +87,7 @@ Aktueller Migrationsstand:
 | `001_init` | Basisschema (Benutzer, Spiele, Tipps, Einstellungen, Bonus). |
 | `002_teams` | Tabelle `teams` (deutsche Namen + FIFA-Rang). |
 | `003_match_num` | Spalte `matches.num` (offizielle Spielnummer; nötig für den Turnierbaum). |
+| `004_i18n` | Spalte `users.locale` (Sprache je Benutzer) + `teams.name_pt` (portugiesische Namen). |
 
 > Bei einer Installation, die es **vor** dem Migrationssystem gab, erkennt der
 > Runner die vorhandenen Tabellen automatisch (dank `CREATE TABLE IF NOT EXISTS`)
@@ -150,6 +151,8 @@ cp data/tippspiel.backup-XXXX.sqlite data/tippspiel.sqlite
 | 📊 **Team-Infos beim Tippen** | FIFA-Weltranglistenplatz + letztes Spielergebnis je Mannschaft. |
 | 🏟️ **Gruppen & Turnierbaum** | Gruppentabellen, beste Gruppendritte und KO-Baum (`/turnier`). |
 | 👀 **Tipps der anderen** | Übersicht aller Tipps – erst **nach Anpfiff** sichtbar. |
+| 🌐 **Mehrsprachig (DE/PT)** | Sprache je Benutzer wählbar (Konto → Sprache); Umschalter auf der Login-Seite. |
+| 🗂️ **Gruppen & Turnierbaum** | Gruppentabellen + KO-Baum mit Runden-Tabs und stufenweisem Wischen. |
 | 🔁 **Migrationssystem** | Sichere, datenerhaltende Updates (`schema_migrations`). |
 
 ### FIFA-Ränge anpassen

@@ -1,16 +1,13 @@
 <?php /** @var array $matches @var int $meId */ ?>
 
-<h1 class="page-title">👀 Tipps der anderen</h1>
-<p class="muted intro">
-    Sichtbar sind nur Spiele, die schon angepfiffen wurden – vorher bleibt jeder
-    Tipp geheim.
-</p>
+<h1 class="page-title"><?= e(t('tips.title')) ?></h1>
+<p class="muted intro"><?= e(t('tips.intro')) ?></p>
 
 <?php if (!$matches): ?>
     <div class="empty">
         <div class="empty-ico">🔒</div>
-        <p>Noch keine angepfiffenen Spiele.</p>
-        <p class="muted">Sobald das erste Spiel läuft, erscheinen hier die Tipps aller Mitspieler.</p>
+        <p><?= e(t('tips.empty_title')) ?></p>
+        <p class="muted"><?= e(t('tips.empty_sub')) ?></p>
     </div>
 <?php else: ?>
     <?php foreach ($matches as $m):
@@ -26,17 +23,17 @@
                     <?php if ($finished): ?>
                         <span class="score-final"><?= (int) $m['score1'] ?>:<?= (int) $m['score2'] ?></span>
                     <?php else: ?>
-                        <span class="status status-live">läuft</span>
+                        <span class="status status-live"><?= e(t('tips.live')) ?></span>
                     <?php endif; ?>
                 </div>
             </div>
-            <div class="tip-meta muted"><?= e(fmt_datetime($m['kickoff'])) ?> Uhr</div>
+            <div class="tip-meta muted"><?= e(fmt_datetime($m['kickoff'])) ?> <?= e(t('common.clock')) ?></div>
 
             <table class="table tip-table">
                 <tbody>
                 <?php foreach ($m['tips'] as $t): ?>
                     <tr class="<?= $t['user_id'] === $meId ? 'me-row' : '' ?>">
-                        <td><?= e($t['name']) ?><?= $t['user_id'] === $meId ? ' <span class="you-tag">(du)</span>' : '' ?></td>
+                        <td><?= e($t['name']) ?><?= $t['user_id'] === $meId ? ' <span class="you-tag">' . e(t('standings.you')) . '</span>' : '' ?></td>
                         <td class="num tip-pred">
                             <?php if ($t['has_bet']): ?>
                                 <?= (int) $t['pred1'] ?>:<?= (int) $t['pred2'] ?>
@@ -46,9 +43,9 @@
                         </td>
                         <td class="num">
                             <?php if ($t['points'] !== null): ?>
-                                <span class="bet-chip pts-<?= (int) $t['points'] ?>"><?= (int) $t['points'] ?> P</span>
+                                <span class="bet-chip pts-<?= (int) $t['points'] ?>"><?= (int) $t['points'] ?> <?= e(t('common.points_short')) ?></span>
                             <?php elseif ($t['has_bet'] && $finished): ?>
-                                <span class="bet-chip pts-0">0 P</span>
+                                <span class="bet-chip pts-0">0 <?= e(t('common.points_short')) ?></span>
                             <?php endif; ?>
                         </td>
                     </tr>

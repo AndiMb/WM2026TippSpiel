@@ -1,19 +1,37 @@
-<?php /** @var array $me @var bool $bonusEnabled @var array $bonusQuestions @var array $bonusAnswers */ ?>
+<?php /** @var array $me @var bool $bonusEnabled @var array $bonusQuestions @var array $bonusAnswers @var array $languages */ ?>
 
-<h1 class="page-title">👤 Mein Konto</h1>
+<h1 class="page-title"><?= e(t('account.title')) ?></h1>
 
 <section class="section card">
-    <h2 class="section-title">Profil</h2>
+    <h2 class="section-title"><?= e(t('account.profile')) ?></h2>
     <dl class="profile">
-        <dt>Anzeigename</dt><dd><?= e($me['display_name']) ?></dd>
-        <dt>Benutzername</dt><dd><?= e($me['username']) ?></dd>
-        <dt>Rolle</dt><dd><?= $me['role'] === 'admin' ? 'Administrator' : 'Spieler' ?></dd>
+        <dt><?= e(t('account.display_name')) ?></dt><dd><?= e($me['display_name']) ?></dd>
+        <dt><?= e(t('account.username')) ?></dt><dd><?= e($me['username']) ?></dd>
+        <dt><?= e(t('account.role')) ?></dt><dd><?= $me['role'] === 'admin' ? e(t('account.role_admin')) : e(t('account.role_player')) ?></dd>
     </dl>
+</section>
+
+<section class="section card">
+    <h2 class="section-title"><?= e(t('account.language')) ?></h2>
+    <form method="post" action="<?= e(url('/konto/sprache')) ?>" class="form">
+        <?= csrf_field() ?>
+        <label class="field">
+            <span class="field-label"><?= e(t('account.language_label')) ?></span>
+            <select class="input" name="locale">
+                <?php foreach ($languages as $lc): ?>
+                    <option value="<?= e($lc) ?>" <?= ($me['locale'] ?? 'de') === $lc ? 'selected' : '' ?>>
+                        <?= e(t('lang.' . $lc)) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </label>
+        <button class="btn btn-primary" type="submit"><?= e(t('account.language_save')) ?></button>
+    </form>
 </section>
 
 <?php if ($bonusEnabled && $bonusQuestions): ?>
 <section class="section card">
-    <h2 class="section-title">⭐ Bonusfragen</h2>
+    <h2 class="section-title"><?= e(t('account.bonus')) ?></h2>
     <form method="post" action="<?= e(url('/konto/bonus')) ?>" class="form">
         <?= csrf_field() ?>
         <?php foreach ($bonusQuestions as $q):
@@ -22,44 +40,44 @@
             $resolved = $q['correct_answer'] !== null && $q['correct_answer'] !== ''; ?>
             <div class="field">
                 <span class="field-label">
-                    <?= e($q['question']) ?> <span class="muted">(<?= (int) $q['points'] ?> P)</span>
+                    <?= e($q['question']) ?> <span class="muted">(<?= (int) $q['points'] ?> <?= e(t('common.points_short')) ?>)</span>
                 </span>
                 <input class="input" type="text" name="bonus[<?= (int) $q['id'] ?>]"
                        value="<?= e($a['answer'] ?? '') ?>"
                        <?= $locked || $resolved ? 'disabled' : '' ?>
-                       maxlength="120" placeholder="Deine Antwort">
+                       maxlength="120" placeholder="<?= e(t('account.bonus_answer')) ?>">
                 <?php if ($resolved): ?>
-                    <small class="hint">Richtig: <strong><?= e($q['correct_answer']) ?></strong>
-                        <?php if ($a && $a['points'] !== null): ?>· du: <?= (int) $a['points'] ?> P<?php endif; ?>
+                    <small class="hint"><?= e(t('account.bonus_correct')) ?> <strong><?= e($q['correct_answer']) ?></strong>
+                        <?php if ($a && $a['points'] !== null): ?>· <?= (int) $a['points'] ?> <?= e(t('common.points_short')) ?><?php endif; ?>
                     </small>
                 <?php elseif ($locked): ?>
-                    <small class="hint">Einsendeschluss erreicht.</small>
+                    <small class="hint"><?= e(t('account.bonus_deadline_over')) ?></small>
                 <?php elseif (!empty($q['deadline'])): ?>
-                    <small class="hint">Bis <?= e(fmt_datetime($q['deadline'])) ?> Uhr änderbar.</small>
+                    <small class="hint"><?= e(t('account.bonus_deadline', ['date' => fmt_datetime($q['deadline']), 'clock' => t('common.clock')])) ?></small>
                 <?php endif; ?>
             </div>
         <?php endforeach; ?>
-        <button class="btn btn-primary" type="submit">Bonus-Tipps speichern</button>
+        <button class="btn btn-primary" type="submit"><?= e(t('account.bonus_save')) ?></button>
     </form>
 </section>
 <?php endif; ?>
 
 <section class="section card">
-    <h2 class="section-title">🔒 Passwort ändern</h2>
+    <h2 class="section-title"><?= e(t('account.pw_title')) ?></h2>
     <form method="post" action="<?= e(url('/konto/passwort')) ?>" class="form">
         <?= csrf_field() ?>
         <label class="field">
-            <span class="field-label">Aktuelles Passwort</span>
+            <span class="field-label"><?= e(t('account.pw_current')) ?></span>
             <input class="input" type="password" name="current" autocomplete="current-password" required>
         </label>
         <label class="field">
-            <span class="field-label">Neues Passwort</span>
+            <span class="field-label"><?= e(t('account.pw_new')) ?></span>
             <input class="input" type="password" name="new" autocomplete="new-password" minlength="6" required>
         </label>
         <label class="field">
-            <span class="field-label">Neues Passwort wiederholen</span>
+            <span class="field-label"><?= e(t('account.pw_repeat')) ?></span>
             <input class="input" type="password" name="confirm" autocomplete="new-password" minlength="6" required>
         </label>
-        <button class="btn btn-primary" type="submit">Passwort ändern</button>
+        <button class="btn btn-primary" type="submit"><?= e(t('account.pw_submit')) ?></button>
     </form>
 </section>

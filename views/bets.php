@@ -15,22 +15,21 @@ $teamHint = function (string $en) use ($forms): string {
     if (isset($forms[$en])) {
         $f = $forms[$en];
         $icon = $f['outcome'] === 'win' ? '✅' : ($f['outcome'] === 'loss' ? '❌' : '➖');
-        $parts[] = 'zuletzt ' . $icon . ' ' . (int) $f['gf'] . ':' . (int) $f['ga']
-                 . ' gg. ' . e(tname($f['opp']));
+        $parts[] = t('bets.hint_last') . ' ' . $icon . ' ' . (int) $f['gf'] . ':' . (int) $f['ga']
+                 . ' ' . t('bets.hint_vs') . ' ' . e(tname($f['opp']));
     }
     return implode(' · ', $parts);
 };
 ?>
 
-<h1 class="page-title">Spiele tippen</h1>
-<p class="muted intro">Tippe das Endergebnis. Du kannst deinen Tipp bis zum Anpfiff ändern.
-Die kleinen Hinweise (FIFA-Rang, letztes Spiel) helfen beim Schätzen.</p>
+<h1 class="page-title"><?= e(t('bets.title')) ?></h1>
+<p class="muted intro"><?= e(t('bets.intro')) ?></p>
 
 <?php if (!$matches): ?>
     <div class="empty">
         <div class="empty-ico">📭</div>
-        <p>Aktuell gibt es keine Spiele zum Tippen.</p>
-        <p class="muted">Sobald neue Spiele anstehen, erscheinen sie hier.</p>
+        <p><?= e(t('bets.empty_title')) ?></p>
+        <p class="muted"><?= e(t('bets.empty_sub')) ?></p>
     </div>
 <?php else: ?>
 <form method="post" action="<?= e(url('/tippen')) ?>" id="bet-form">
@@ -50,7 +49,7 @@ Die kleinen Hinweise (FIFA-Rang, letztes Spiel) helfen beim Schätzen.</p>
 
         <div class="bet-card">
             <div class="bet-card-meta">
-                <?= e(fmt_datetime($m['kickoff'], 'H:i')) ?> Uhr
+                <?= e(fmt_datetime($m['kickoff'], 'H:i')) ?> <?= e(t('common.clock')) ?>
                 <?php if (!empty($m['group_name'])): ?>· <?= e($m['group_name']) ?><?php endif; ?>
                 <?php if (!empty($m['venue'])): ?>· <?= e($m['venue']) ?><?php endif; ?>
             </div>
@@ -84,7 +83,7 @@ Die kleinen Hinweise (FIFA-Rang, letztes Spiel) helfen beim Schätzen.</p>
     </div>
 
     <div class="sticky-save">
-        <button class="btn btn-primary btn-lg btn-block" type="submit">✅ Tipps speichern</button>
+        <button class="btn btn-primary btn-lg btn-block" type="submit"><?= e(t('bets.save')) ?></button>
     </div>
 </form>
 <?php endif; ?>

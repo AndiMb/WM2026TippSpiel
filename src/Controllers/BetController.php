@@ -26,7 +26,7 @@ final class BetController
             'matches' => $matches,
             'betMap'  => $betMap,
             'forms'   => TeamService::lastResultsMap(), // letztes Ergebnis je Team
-        ], 'Spiele tippen');
+        ], t('bets.title'));
     }
 
     public function save(): void
@@ -39,7 +39,7 @@ final class BetController
         $pred2 = $_POST['pred2'] ?? [];
 
         if (!is_array($pred1) || !is_array($pred2)) {
-            Session::flash('error', 'Ungültige Eingabe.');
+            Session::flash('error', t('flash.bets_invalid'));
             redirect('/tippen');
         }
 
@@ -73,8 +73,8 @@ final class BetController
         }
 
         Session::flash('success', $saved > 0
-            ? "$saved Tipp(s) gespeichert. Viel Glück!"
-            : 'Keine Tipps gespeichert.');
+            ? t('flash.bets_saved', ['count' => $saved])
+            : t('flash.bets_none'));
         redirect('/tippen');
     }
 }
