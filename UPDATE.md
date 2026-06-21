@@ -4,7 +4,8 @@ Diese Anleitung beschreibt, wie du eine bestehende Installation auf eine neue
 Version aktualisierst, **ohne vorhandene Daten zu verlieren** (Benutzer, Tipps,
 Ergebnisse, Einstellungen). Sie gilt insbesondere für **SQLite**.
 
-> Kurzfassung: **Backup → Code aktualisieren → `php database/migrate.php`** – fertig.
+> Kurzfassung: **Backup → Code aktualisieren → `php database/migrate.php` →
+> `php bin/import_schedule.php`** – fertig.
 
 ---
 
@@ -74,9 +75,18 @@ Beispielausgabe bei einem Update:
 ```
 Datenbanktreiber: sqlite
   = 001_init (bereits angewendet)
-  + 002_teams wird angewendet ...
+  = 002_teams (bereits angewendet)
+  + 003_match_num wird angewendet ...
 ✓ Migrationen abgeschlossen.
 ```
+
+Aktueller Migrationsstand:
+
+| Version | Inhalt |
+|---------|--------|
+| `001_init` | Basisschema (Benutzer, Spiele, Tipps, Einstellungen, Bonus). |
+| `002_teams` | Tabelle `teams` (deutsche Namen + FIFA-Rang). |
+| `003_match_num` | Spalte `matches.num` (offizielle Spielnummer; nötig für den Turnierbaum). |
 
 > Bei einer Installation, die es **vor** dem Migrationssystem gab, erkennt der
 > Runner die vorhandenen Tabellen automatisch (dank `CREATE TABLE IF NOT EXISTS`)
@@ -93,17 +103,35 @@ php bin/sync_teams.php
 ```
 
 > Wird auch automatisch bei jedem Spielplan-Import ausgeführt. Der Schritt ist
-> nur nötig, wenn du nicht ohnehin gleich importierst. Die deutschen Namen
-> funktionieren dank Datei-Fallback auch ohne diesen Schritt.
+> nur nötig, wenn du nicht ohnehin gleich importierst. Deutsche Namen **und
+> Flaggen** funktionieren dank Datei-Fallback auch ohne diesen Schritt.
 
 ---
 
-## 5. Prüfen
+## 5. Spielplan importieren (für den Turnierbaum wichtig)
+
+Damit die **Spielnummern** (`num`) gefüllt sind und der **Turnierbaum**
+vollständig erscheint, nach den Migrationen einmal importieren:
+
+```bash
+php bin/import_schedule.php
+```
+
+> Alternativ im Adminbereich: **Spiele & Ergebnisse → „Jetzt online importieren"**.
+> Beim Import werden vorhandene Spiele aktualisiert (keine Duplikate) und die
+> KO-Spiele über ihre Spielnummer abgeglichen. Läuft ohnehin ein Cronjob für den
+> Import, genügt dessen nächster Lauf.
+
+---
+
+## 6. Prüfen
 
 1. Seite im Browser öffnen und einloggen.
-2. **Spiele tippen** öffnen – Ländernamen sind deutsch, unter jeder Mannschaft
-   stehen FIFA-Rang und letztes Ergebnis.
-3. **Rangliste → „Tipps der anderen"** öffnen.
+2. **Spiele tippen** öffnen – Ländernamen sind deutsch, jede Mannschaft hat eine
+   **Flagge**, darunter FIFA-Rang und letztes Ergebnis.
+3. **Turnier** öffnen – Gruppentabellen und KO-Turnierbaum (Sechzehntelfinale
+   zeigt die Plätze laut aktuellem Tabellenstand).
+4. **Rangliste → „Tipps der anderen"** öffnen.
 
 Fertig. Falls etwas klemmt, Backup zurückspielen:
 
@@ -118,7 +146,9 @@ cp data/tippspiel.backup-XXXX.sqlite data/tippspiel.sqlite
 | Neu | Beschreibung |
 |-----|--------------|
 | 🇩🇪 **Deutsche Ländernamen** | Übersetzung über `src/Data/teams.php` (anpassbar). |
+| 🏴 **Flaggen** | Lokale SVG-Flaggen je Mannschaft (`public/assets/img/flags/`), keine externen Server. |
 | 📊 **Team-Infos beim Tippen** | FIFA-Weltranglistenplatz + letztes Spielergebnis je Mannschaft. |
+| 🏟️ **Gruppen & Turnierbaum** | Gruppentabellen, beste Gruppendritte und KO-Baum (`/turnier`). |
 | 👀 **Tipps der anderen** | Übersicht aller Tipps – erst **nach Anpfiff** sichtbar. |
 | 🔁 **Migrationssystem** | Sichere, datenerhaltende Updates (`schema_migrations`). |
 
@@ -126,3 +156,9 @@ cp data/tippspiel.backup-XXXX.sqlite data/tippspiel.sqlite
 
 Die Ränge in `src/Data/teams.php` sind eine Näherung. Zum Aktualisieren die
 Datei bearbeiten und anschließend `php bin/sync_teams.php` ausführen.
+
+### Flaggen ergänzen
+
+Fehlt eine Flagge, die passende `<iso2>.svg` nach
+`public/assets/img/flags/` legen und in `src/Data/teams.php` den `iso2`-Code
+eintragen (Details: `public/assets/img/flags/README.md`).
