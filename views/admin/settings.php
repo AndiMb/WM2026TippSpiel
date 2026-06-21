@@ -60,7 +60,35 @@
         <label class="field">
             <span class="field-label">Turniername</span>
             <input class="input" type="text" name="tournament_name"
-                   value="<?= e($settings['tournament_name'] ?? 'FIFA WM 2026') ?>" maxlength="80">
+                   value="<?= e($settings['tournament_name'] ?? 'WM 2026 Tippspiel') ?>" maxlength="80">
+        </label>
+    </section>
+
+    <section class="section card">
+        <h2 class="section-title">Rechtliches (Impressum &amp; Datenschutz)</h2>
+        <p class="muted">
+            Wird die Seite öffentlich im Internet erreichbar gemacht, sollten
+            Impressum und Datenschutzerklärung ausgefüllt sein. Die Angaben
+            erscheinen auf den Seiten <a href="<?= e(url('/impressum')) ?>" target="_blank">/impressum</a>
+            und <a href="<?= e(url('/datenschutz')) ?>" target="_blank">/datenschutz</a>.
+            Siehe auch <code>RECHTLICHES.md</code>.
+        </p>
+        <label class="field">
+            <span class="field-label">Betreiber (Name)</span>
+            <input class="input" type="text" name="operator_name"
+                   value="<?= e($settings['operator_name'] ?? '') ?>" maxlength="120"
+                   placeholder="Vor- und Nachname">
+        </label>
+        <label class="field">
+            <span class="field-label">Anschrift</span>
+            <textarea class="input" name="operator_address" rows="3" maxlength="400"
+                      placeholder="Straße Nr.&#10;PLZ Ort"><?= e($settings['operator_address'] ?? '') ?></textarea>
+        </label>
+        <label class="field">
+            <span class="field-label">Kontakt-E-Mail</span>
+            <input class="input" type="email" name="operator_email"
+                   value="<?= e($settings['operator_email'] ?? '') ?>" maxlength="120"
+                   placeholder="name@example.com">
         </label>
     </section>
 
