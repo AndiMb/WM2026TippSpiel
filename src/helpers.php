@@ -88,3 +88,20 @@ function tname(?string $en): string
 {
     return $en === null ? '' : \App\Services\TeamService::nameDe($en);
 }
+
+/**
+ * Flaggen-Grafik einer Mannschaft als <img>-Tag (oder leer, wenn unbekannt).
+ * Die Flagge ist rein dekorativ (der Name steht daneben) -> alt="" + aria-hidden.
+ */
+function flag(?string $en): string
+{
+    if ($en === null) {
+        return '';
+    }
+    $iso = \App\Services\TeamService::iso2($en);
+    if ($iso === null) {
+        return '';
+    }
+    $src = url('/assets/img/flags/' . $iso . '.svg');
+    return '<img class="flag" src="' . e($src) . '" alt="" aria-hidden="true" width="20" height="15" loading="lazy">';
+}

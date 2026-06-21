@@ -15,8 +15,9 @@ App-Installation.
 
 * **Kinderleichte Bedienung** – große Buttons, große Zahlenfelder, klare
   Sprache. Auch für Kinder ab 9 Jahren problemlos nutzbar.
-* **Deutsche Ländernamen** – automatische Übersetzung der englischen Quelldaten
-  (anpassbar in `src/Data/teams.php`).
+* **Deutsche Ländernamen + Flaggen** – automatische Übersetzung der englischen
+  Quelldaten und lokale SVG-Flaggen (anpassbar in `src/Data/teams.php`), damit
+  auch Lese-Anfänger die Mannschaften erkennen. Keine externen Server zur Laufzeit.
 * **Tipphilfen** – pro Mannschaft FIFA-Weltranglistenplatz und letztes
   Spielergebnis, damit auch Kinder Anhaltspunkte für ihren Tipp haben.
 * **Tipps der anderen** – Übersicht aller Mitspieler-Tipps, fair erst **nach

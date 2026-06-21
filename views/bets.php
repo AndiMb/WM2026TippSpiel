@@ -56,6 +56,7 @@ Die kleinen Hinweise (FIFA-Rang, letztes Spiel) helfen beim Schätzen.</p>
             </div>
             <div class="bet-card-row">
                 <div class="bet-team bet-team-home">
+                    <div class="bet-flag"><?= flag($m['team1']) ?></div>
                     <div class="bet-team-name"><?= e(tname($m['team1'])) ?></div>
                     <div class="team-hint"><?= $teamHint($m['team1']) ?></div>
                 </div>
@@ -73,6 +74,7 @@ Die kleinen Hinweise (FIFA-Rang, letztes Spiel) helfen beim Schätzen.</p>
                 </div>
 
                 <div class="bet-team bet-team-away">
+                    <div class="bet-flag"><?= flag($m['team2']) ?></div>
                     <div class="bet-team-name"><?= e(tname($m['team2'])) ?></div>
                     <div class="team-hint"><?= $teamHint($m['team2']) ?></div>
                 </div>

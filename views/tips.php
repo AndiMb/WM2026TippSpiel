@@ -18,7 +18,9 @@
         <section class="card tip-block">
             <div class="tip-head">
                 <div class="tip-teams">
-                    <?= e(tname($m['team1'])) ?> – <?= e(tname($m['team2'])) ?>
+                    <?= flag($m['team1']) ?> <?= e(tname($m['team1'])) ?>
+                    <span class="vs">–</span>
+                    <?= flag($m['team2']) ?> <?= e(tname($m['team2'])) ?>
                 </div>
                 <div class="tip-res">
                     <?php if ($finished): ?>

@@ -52,7 +52,7 @@
             <form method="post" action="<?= e(url('/admin/spiele/' . (int) $m['id'] . '/ergebnis')) ?>" class="match-admin-row">
                 <?= csrf_field() ?>
                 <div class="ma-info">
-                    <div class="ma-teams"><?= e(tname($m['team1'])) ?> – <?= e(tname($m['team2'])) ?></div>
+                    <div class="ma-teams"><?= flag($m['team1']) ?> <?= e(tname($m['team1'])) ?> – <?= flag($m['team2']) ?> <?= e(tname($m['team2'])) ?></div>
                     <div class="ma-meta">
                         <?= e(fmt_datetime($m['kickoff'])) ?>
                         <?php if (!empty($m['group_name'])): ?>· <?= e($m['group_name']) ?><?php endif; ?>

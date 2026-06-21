@@ -68,6 +68,24 @@ final class TeamService
     }
 
     /**
+     * ISO-3166-Alpha-2-Code für die Flaggen-Grafik (oder null).
+     * Wird direkt aus der Datei gelesen, da die DB-Tabelle keinen ISO-Code führt.
+     */
+    public static function iso2(string $en): ?string
+    {
+        static $iso = null;
+        if ($iso === null) {
+            $iso = [];
+            foreach (self::data() as $name => $info) {
+                if (!empty($info['iso2'])) {
+                    $iso[$name] = $info['iso2'];
+                }
+            }
+        }
+        return $iso[$en] ?? null;
+    }
+
+    /**
      * Letztes beendetes Spiel je Mannschaft, abgeleitet aus den eigenen Daten.
      * Eine einzige Abfrage, danach in PHP ausgewertet.
      *
