@@ -31,6 +31,14 @@
     <?php endforeach; ?>
 
     <?= $content /* bereits in den Views via e() escaped */ ?>
+
+    <?php if ($user): ?>
+    <footer class="page-footer">
+        <a href="<?= e(url('/impressum')) ?>">Impressum</a>
+        <span aria-hidden="true">·</span>
+        <a href="<?= e(url('/datenschutz')) ?>">Datenschutz</a>
+    </footer>
+    <?php endif; ?>
 </main>
 
 <?php if ($user): ?>

@@ -36,8 +36,13 @@ final class SettingsController
         Setting::set('bonus_enabled', isset($_POST['bonus_enabled']) ? '1' : '0');
 
         // Turniername
-        $name = trim((string) ($_POST['tournament_name'] ?? 'FIFA WM 2026'));
-        Setting::set('tournament_name', $name !== '' ? mb_substr($name, 0, 80) : 'FIFA WM 2026');
+        $name = trim((string) ($_POST['tournament_name'] ?? 'WM 2026 Tippspiel'));
+        Setting::set('tournament_name', $name !== '' ? mb_substr($name, 0, 80) : 'WM 2026 Tippspiel');
+
+        // Rechtliches (Impressum/Datenschutz)
+        Setting::set('operator_name',    mb_substr(trim((string) ($_POST['operator_name'] ?? '')), 0, 120));
+        Setting::set('operator_address', mb_substr(trim((string) ($_POST['operator_address'] ?? '')), 0, 400));
+        Setting::set('operator_email',   mb_substr(trim((string) ($_POST['operator_email'] ?? '')), 0, 120));
 
         Session::flash('success', 'Einstellungen gespeichert. Tipp: Anschließend "Punkte neu berechnen".');
         redirect('/admin/einstellungen');

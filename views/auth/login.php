@@ -18,5 +18,11 @@
             </label>
             <button class="btn btn-primary btn-block btn-lg" type="submit">Anmelden</button>
         </form>
+
+        <p class="login-legal">
+            <a href="<?= e(url('/impressum')) ?>">Impressum</a>
+            <span aria-hidden="true">·</span>
+            <a href="<?= e(url('/datenschutz')) ?>">Datenschutz</a>
+        </p>
     </div>
 </div>

@@ -305,6 +305,21 @@ body {
     .bet-team { font-size: 15px; }
 }
 
+/* ---------- Footer & Rechtstexte ---------- */
+.page-footer {
+    margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--border);
+    text-align: center; font-size: 14px;
+}
+.page-footer a { color: var(--muted); text-decoration: none; margin: 0 6px; }
+.page-footer a:hover { color: var(--ink); text-decoration: underline; }
+.login-legal { margin-top: 18px; text-align: center; font-size: 14px; }
+.login-legal a { color: var(--muted); text-decoration: none; margin: 0 6px; }
+.legal-text { line-height: 1.6; }
+.legal-text h2 { font-size: 18px; margin: 18px 0 6px; }
+.legal-text ul { padding-left: 20px; }
+.legal-text li { margin-bottom: 6px; }
+.legal-disclaimer { margin-top: 18px; font-size: 13px; font-style: italic; }
+
 /* ---------- Barrierefreiheit ---------- */
 @media (prefers-reduced-motion: reduce) {
     * { transition: none !important; }

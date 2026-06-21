@@ -16,6 +16,7 @@ use App\Controllers\BetController;
 use App\Controllers\StandingsController;
 use App\Controllers\TipsController;
 use App\Controllers\AccountController;
+use App\Controllers\LegalController;
 use App\Controllers\Admin\AdminController;
 use App\Controllers\Admin\UserController;
 use App\Controllers\Admin\MatchController;
@@ -30,6 +31,10 @@ $router = new Router();
 $router->get('/login',  [AuthController::class, 'showLogin']);
 $router->post('/login', [AuthController::class, 'login']);
 $router->post('/logout',[AuthController::class, 'logout']);
+
+// Rechtstexte (ohne Login erreichbar)
+$router->get('/impressum',   [LegalController::class, 'impressum']);
+$router->get('/datenschutz', [LegalController::class, 'datenschutz']);
 
 // --- Spieler -----------------------------------------------------------
 $router->get('/',          [DashboardController::class, 'index']);

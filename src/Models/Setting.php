@@ -19,7 +19,11 @@ final class Setting
         'points_tendency' => '1',     // richtige Tendenz (Sieger/Remis)
         'scoring_mode'    => 'zero_past', // 'zero_past' (Variante A) | 'since_join' (Variante B)
         'bonus_enabled'   => '0',     // Bonusfragen aktiv?
-        'tournament_name' => 'FIFA WM 2026',
+        'tournament_name' => 'WM 2026 Tippspiel',
+        // Rechtliches (für Impressum/Datenschutz; vom Betreiber auszufüllen)
+        'operator_name'    => '',     // Name des Betreibers
+        'operator_address' => '',     // Anschrift (mehrzeilig erlaubt)
+        'operator_email'   => '',     // Kontakt-E-Mail
     ];
 
     private static function load(): void
