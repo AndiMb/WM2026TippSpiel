@@ -92,8 +92,10 @@ final class ScheduleImporter
             [$s1, $s2, $status] = self::extractScore($m['score'] ?? null);
 
             $group = $m['group'] ?? null;
+            $num   = isset($m['num']) ? (int) $m['num'] : null;  // Spielnummer (KO-Phase)
             $out[] = [
                 'ext_key'    => self::extKey($kickoff, $team1, $team2),
+                'num'        => $num,
                 'stage'      => $group ? 'group' : 'knockout',
                 'round_name' => $m['round'] ?? null,
                 'group_name' => $group,
@@ -193,7 +195,12 @@ final class ScheduleImporter
         $inserted = $updated = $scored = 0;
 
         foreach ($matches as $m) {
-            $existing = MatchModel::findByExtKey($m['ext_key']);
+            // KO-Spiele werden über die stabile Spielnummer erkannt – so wird
+            // dasselbe Spiel auch dann wiedergefunden, wenn die Mannschaften
+            // erst im Turnierverlauf feststehen (Platzhalter -> echtes Team).
+            // Gruppenspiele (ohne Nummer) werden über den ext_key erkannt.
+            $existing = (!empty($m['num']) ? MatchModel::findByNum((int) $m['num']) : null)
+                ?? MatchModel::findByExtKey($m['ext_key']);
 
             if ($existing === null) {
                 $newId = MatchModel::insertMatch($m);
