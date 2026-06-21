@@ -338,12 +338,25 @@ body {
 .legal-disclaimer { margin-top: 18px; font-size: 13px; font-style: italic; }
 
 /* ---------- Turnier: Gruppen ---------- */
-.group-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-.group-card { padding: 10px 12px; margin-bottom: 0; }
+/* auto-fit: einspaltig auf schmalen Geräten, zweispaltig erst ab genügend Platz.
+   min(100%, 300px) verhindert, dass eine Spalte breiter als der Bildschirm wird. */
+.group-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    gap: 12px;
+}
+.group-card { padding: 10px 12px; margin-bottom: 0; min-width: 0; }
 .group-title { margin: 0 0 8px; font-size: 16px; }
+/* feste Spaltenbreiten -> die Tabelle passt sich der Kartenbreite an, lange
+   Mannschaftsnamen brechen um statt überzulaufen. */
+.group-table { table-layout: fixed; width: 100%; }
 .group-table th, .group-table td { padding: 6px 6px; font-size: 14px; }
-.group-table .pos { width: 1.4em; color: var(--muted); font-weight: 700; }
-.group-table .t { font-weight: 700; }
+/* Spaltenbreiten bei table-layout:fixed über die KOPFZEILE festlegen,
+   damit die Team-Spalte den restlichen Platz bekommt. */
+.group-table th:first-child, .group-table .pos { width: 1.8em; }
+.group-table .pos { color: var(--muted); font-weight: 700; }
+.group-table .num { width: 2.6em; }
+.group-table .t { font-weight: 700; white-space: normal; word-break: break-word; }
 .group-table .q-top  td { background: var(--green-light); }
 .group-table .q-third td { background: #fff7e3; }
 .legend .dot { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 2px; }
@@ -351,9 +364,9 @@ body {
 .legend .dot.q-third { background: #fff7e3; border: 1px solid #f3d191; }
 
 /* ---------- Turnier: Turnierbaum ---------- */
-.bracket-scroll { overflow-x: auto; padding-bottom: 8px; -webkit-overflow-scrolling: touch; }
+.bracket-scroll { overflow-x: auto; max-width: 100%; padding-bottom: 8px; -webkit-overflow-scrolling: touch; }
 .bracket { display: flex; gap: 14px; min-width: min-content; }
-.bracket-round { flex: 0 0 auto; width: 220px; }
+.bracket-round { flex: 0 0 auto; width: 210px; }
 .round-title {
     font-size: 14px; margin: 0 0 10px; text-align: center;
     background: var(--green); color: #fff; padding: 6px; border-radius: 10px;
@@ -368,8 +381,8 @@ body {
     padding: 3px 0;
 }
 .ko-side + .ko-side { border-top: 1px dashed var(--border); }
-.ko-team { font-weight: 700; font-size: 14px; line-height: 1.25; }
-.ko-score { font-weight: 800; font-variant-numeric: tabular-nums; min-width: 1.2em; text-align: right; }
+.ko-team { flex: 1 1 auto; min-width: 0; font-weight: 700; font-size: 14px; line-height: 1.25; overflow-wrap: anywhere; }
+.ko-score { flex: 0 0 auto; font-weight: 800; font-variant-numeric: tabular-nums; min-width: 1.2em; text-align: right; }
 .ko-meta { font-size: 11px; color: var(--muted); margin-top: 5px; }
 .slot-label { font-weight: 600; color: var(--muted); font-style: italic; }
 .proj { color: var(--blue); font-weight: 700; font-size: .85em; }
