@@ -170,6 +170,16 @@ $renderMatch = function (array $bm) use ($side): string {
             <button type="button" class="btn btn-small" id="bracket-reset" hidden><?= e(t('tour.sim_reset')) ?></button>
         </div>
 
+        <div class="bracket-wide">
+        <!-- Runden-Buttons: direkt zur Runde springen -->
+        <div class="round-tabs" id="round-tabs" role="tablist">
+            <?php foreach ($mainRounds as $i => $round): ?>
+                <button type="button" class="round-tab<?= $i === 0 ? ' is-active' : '' ?>" data-idx="<?= $i ?>">
+                    <?= e(t('round.' . $round['name'])) ?>
+                </button>
+            <?php endforeach; ?>
+        </div>
+
         <div class="bracket-scroll" id="bracket-scroll">
             <div class="bracket" id="bracket">
                 <svg class="bracket-lines" id="bracket-lines" aria-hidden="true"></svg>
@@ -183,6 +193,7 @@ $renderMatch = function (array $bm) use ($side): string {
                 <?php endforeach; ?>
             </div>
         </div>
+        </div><!-- /.bracket-wide -->
 
         <?php if ($thirdPlace): ?>
             <div class="third-place">
