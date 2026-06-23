@@ -405,11 +405,11 @@ body {
 
 /* Desktop: Der Baum darf die volle Bildschirmbreite nutzen (aus dem 760px-
    Container ausbrechen), damit möglichst viele Runden gleichzeitig sichtbar sind
-   und kaum noch seitlich gescrollt werden muss. Zusätzlich feste Höhe, damit der
-   waagerechte Scrollbalken immer unten erreichbar ist. */
+   und kaum noch seitlich gescrollt werden muss. Senkrecht wird nur die Seite
+   gescrollt (kein eigener Scrollbereich im Baum mehr) – das vermeidet das
+   verwirrende „doppelte Scrollen". Zum Finale springt man über die Runden-Buttons. */
 @media (min-width: 800px) {
     .bracket-wide { width: 94vw; margin-left: calc(50% - 47vw); }
-    .bracket-scroll { max-height: 76vh; overflow: auto; }
 }
 
 /* Der Baum: Runden nebeneinander, alle gleich hoch (align-items: stretch). */
