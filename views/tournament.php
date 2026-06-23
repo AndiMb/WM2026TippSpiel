@@ -1,27 +1,47 @@
 <?php /** @var array $groups @var array $bestThirds @var array $bracket */ ?>
 <?php
-/** Ein aufgelöstes Bracket-Team anzeigen (Flagge + Name oder übersetztes Label). */
-$slot = function (array $tm): string {
+/** Übersetzten Text eines Label-Slots erzeugen. */
+$labelText = function (array $tm): string {
+    switch ($tm['kind'] ?? 'raw') {
+        case 'group_winner': return t('tour.group_winner', ['grp' => $tm['grp']]);
+        case 'group_second': return t('tour.group_second', ['grp' => $tm['grp']]);
+        case 'group_third':  return t('tour.group_third', ['grps' => $tm['grps']]);
+        case 'winner_of':    return t('tour.winner_of', ['num' => $tm['num']]);
+        case 'loser_of':     return t('tour.loser_of', ['num' => $tm['num']]);
+        default:             return $tm['label'] ?? '?';
+    }
+};
+
+/** HTML-Inhalt einer Mannschaftszeile (Server-Render = Ausgangszustand). */
+$sideContent = function (array $tm) use ($labelText): string {
     if (($tm['type'] ?? '') === 'team' && !empty($tm['en'])) {
-        $html = flag($tm['en']) . ' ' . e(tname($tm['en']));
+        $html = flag($tm['en']) . ' <span class="kt-name">' . e(tname($tm['en'])) . '</span>';
         if (!empty($tm['proj'])) {
             $html .= ' <span class="proj">' . e(t('tour.proj')) . '</span>';
         }
         return $html;
     }
-    // Label je nach Art übersetzen
-    switch ($tm['kind'] ?? 'raw') {
-        case 'group_winner': $txt = t('tour.group_winner', ['grp' => $tm['grp']]); break;
-        case 'group_second': $txt = t('tour.group_second', ['grp' => $tm['grp']]); break;
-        case 'group_third':  $txt = t('tour.group_third', ['grps' => $tm['grps']]); break;
-        case 'winner_of':    $txt = t('tour.winner_of', ['num' => $tm['num']]); break;
-        case 'loser_of':     $txt = t('tour.loser_of', ['num' => $tm['num']]); break;
-        default:             $txt = $tm['label'] ?? '?';
+    if (($tm['type'] ?? '') === 'open') {
+        return '<span class="ko-open">' . e(t('tour.open')) . '</span>';
     }
-    return '<span class="slot-label">' . e($txt) . '</span>';
+    return '<span class="slot-label">' . e($labelText($tm)) . '</span>';
 };
 
-// Spiel um Platz 3 aus dem Hauptbaum herauslösen (separat anzeigen).
+/** Basis-Objekt eines Slots für das JS-Modell (Simulation). */
+$jsBase = function (array $tm) use ($labelText): array {
+    if (($tm['type'] ?? '') === 'team' && !empty($tm['en'])) {
+        $iso = \App\Services\TeamService::iso2($tm['en']);
+        return ['t' => 'team', 'name' => tname($tm['en']),
+                'flag' => $iso ? url('/assets/img/flags/' . $iso . '.svg') : '',
+                'proj' => !empty($tm['proj'])];
+    }
+    if (($tm['type'] ?? '') === 'open') {
+        return ['t' => 'open'];
+    }
+    return ['t' => 'label', 'text' => $labelText($tm)];
+};
+
+// Spiel um Platz 3 aus dem Hauptbaum lösen.
 $mainRounds = [];
 $thirdPlace = null;
 foreach ($bracket as $round) {
@@ -32,24 +52,41 @@ foreach ($bracket as $round) {
     }
 }
 
-$renderMatch = function (array $bm) use ($slot): string {
+// JS-Modell aufbauen (num -> feeds + zwei Slots).
+$model = [];
+foreach ($mainRounds as $round) {
+    foreach ($round['matches'] as $bm) {
+        if ($bm['num'] === null) { continue; }
+        $model[(string) $bm['num']] = [
+            'feeds' => $bm['feeds'],   // ['to'=>num,'slot'=>1|2] oder null
+            'slots' => [
+                ['feedFrom' => $bm['team1']['feedFrom'] ?? null, 'base' => $jsBase($bm['team1'])],
+                ['feedFrom' => $bm['team2']['feedFrom'] ?? null, 'base' => $jsBase($bm['team2'])],
+            ],
+        ];
+    }
+}
+
+/** Eine Mannschaftszeile (Button) rendern. */
+$side = function (array $bm, int $slot) use ($sideContent): string {
+    $tm = $bm['team' . $slot];
+    $clickable = ($tm['type'] ?? '') === 'team';
+    $score = $bm['score' . $slot];
     ob_start(); ?>
-    <div class="ko-match">
-        <?php if ($bm['num']): ?><div class="ko-num"><?= e(t('tour.match', ['num' => $bm['num']])) ?></div><?php endif; ?>
-        <div class="ko-side">
-            <span class="ko-team"><?= $slot($bm['team1']) ?></span>
-            <span class="ko-score"><?= $bm['score1'] !== null ? (int) $bm['score1'] : '' ?></span>
-        </div>
-        <div class="ko-side">
-            <span class="ko-team"><?= $slot($bm['team2']) ?></span>
-            <span class="ko-score"><?= $bm['score2'] !== null ? (int) $bm['score2'] : '' ?></span>
-        </div>
-        <div class="ko-meta">
-            <?= e(fmt_datetime($bm['kickoff'], 'd.m. H:i')) ?>
-            <?php if (!empty($bm['advances_to'])): ?>
-                <span class="ko-advance"><?= e(t('tour.advances', ['num' => $bm['advances_to']])) ?></span>
-            <?php endif; ?>
-        </div>
+    <button type="button" class="ko-side<?= $clickable ? ' is-clickable' : '' ?>"
+            data-num="<?= (int) $bm['num'] ?>" data-slot="<?= $slot ?>"<?= $clickable ? '' : ' disabled' ?>>
+        <span class="ko-team"><?= $sideContent($tm) ?></span>
+        <?php if ($score !== null): ?><span class="ko-score"><?= (int) $score ?></span><?php endif; ?>
+    </button>
+    <?php return (string) ob_get_clean();
+};
+
+$renderMatch = function (array $bm) use ($side): string {
+    ob_start(); ?>
+    <div class="ko-match" data-num="<?= (int) $bm['num'] ?>">
+        <div class="ko-time"><?= e(fmt_datetime($bm['kickoff'], 'd.m. H:i')) ?></div>
+        <?= $side($bm, 1) ?>
+        <?= $side($bm, 2) ?>
     </div>
     <?php return (string) ob_get_clean();
 };
@@ -122,30 +159,25 @@ $renderMatch = function (array $bm) use ($slot): string {
 </section>
 <?php endif; ?>
 
-<!-- ===================== Turnierbaum (KO) ===================== -->
+<!-- ===================== Turnierbaum (interaktiv) ===================== -->
 <section class="section">
     <h2 class="section-title"><?= e(t('tour.bracket')) ?></h2>
     <?php if (!$mainRounds): ?>
         <p class="muted"><?= e(t('tour.bracket_empty')) ?></p>
     <?php else: ?>
-        <p class="muted intro"><?= e(t('tour.bracket_intro')) ?></p>
-
-        <!-- Runden-Tabs zum stufenweisen Durchblättern -->
-        <div class="round-tabs" id="round-tabs" role="tablist">
-            <?php foreach ($mainRounds as $i => $round): ?>
-                <button type="button" class="round-tab<?= $i === 0 ? ' is-active' : '' ?>" data-idx="<?= $i ?>">
-                    <?= e(t('round.' . $round['name'])) ?>
-                </button>
-            <?php endforeach; ?>
+        <div class="bracket-toolbar">
+            <p class="muted sim-hint"><?= e(t('tour.sim_hint')) ?></p>
+            <button type="button" class="btn btn-small" id="bracket-reset" hidden><?= e(t('tour.sim_reset')) ?></button>
         </div>
 
-        <div class="bracket-scroll" id="bracket">
-            <div class="bracket">
-                <?php foreach ($mainRounds as $i => $round): ?>
-                    <div class="bracket-round" data-idx="<?= $i ?>">
-                        <h3 class="round-title"><?= e(t('round.' . $round['name'])) ?></h3>
+        <div class="bracket-scroll" id="bracket-scroll">
+            <div class="bracket" id="bracket">
+                <svg class="bracket-lines" id="bracket-lines" aria-hidden="true"></svg>
+                <?php foreach ($mainRounds as $round): ?>
+                    <div class="bracket-round">
+                        <div class="round-head"><?= e(t('round.' . $round['name'])) ?></div>
                         <?php foreach ($round['matches'] as $bm): ?>
-                            <?= $renderMatch($bm) ?>
+                            <div class="ko-slot"><?= $renderMatch($bm) ?></div>
                         <?php endforeach; ?>
                     </div>
                 <?php endforeach; ?>
@@ -154,9 +186,12 @@ $renderMatch = function (array $bm) use ($slot): string {
 
         <?php if ($thirdPlace): ?>
             <div class="third-place">
-                <h3 class="round-title round-title-third"><?= e(t('round.Match for third place')) ?></h3>
-                <?= $renderMatch($thirdPlace) ?>
+                <div class="round-head round-head-third"><?= e(t('round.Match for third place')) ?></div>
+                <div class="ko-slot"><?= $renderMatch($thirdPlace) ?></div>
             </div>
         <?php endif; ?>
+
+        <script type="application/json" id="bracket-model"><?= json_encode($model, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
+        <script type="application/json" id="bracket-i18n"><?= json_encode(['open' => t('tour.open'), 'proj' => t('tour.proj')], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
     <?php endif; ?>
 </section>

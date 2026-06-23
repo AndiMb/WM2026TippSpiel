@@ -24,6 +24,7 @@ $teamHint = function (string $en) use ($forms): string {
 
 <h1 class="page-title"><?= e(t('bets.title')) ?></h1>
 <p class="muted intro"><?= e(t('bets.intro')) ?></p>
+<p class="autosave-note" id="autosave-note" hidden><?= e(t('bets.autosave')) ?></p>
 
 <?php if (!$matches): ?>
     <div class="empty">
@@ -47,11 +48,12 @@ $teamHint = function (string $en) use ($forms): string {
             <h2 class="day-head"><?= e($dayShort) ?></h2>
         <?php endif; ?>
 
-        <div class="bet-card">
+        <div class="bet-card" data-match="<?= $id ?>">
             <div class="bet-card-meta">
                 <?= e(fmt_datetime($m['kickoff'], 'H:i')) ?> <?= e(t('common.clock')) ?>
                 <?php if (!empty($m['group_name'])): ?>· <?= e($m['group_name']) ?><?php endif; ?>
                 <?php if (!empty($m['venue'])): ?>· <?= e($m['venue']) ?><?php endif; ?>
+                <span class="bet-status" data-status aria-live="polite"></span>
             </div>
             <div class="bet-card-row">
                 <div class="bet-team bet-team-home">
@@ -86,4 +88,9 @@ $teamHint = function (string $en) use ($forms): string {
         <button class="btn btn-primary btn-lg btn-block" type="submit"><?= e(t('bets.save')) ?></button>
     </div>
 </form>
+<script type="application/json" id="autosave-i18n"><?= json_encode([
+    'saving' => t('bets.saving'),
+    'saved'  => t('bets.saved'),
+    'error'  => t('bets.save_error'),
+], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
 <?php endif; ?>

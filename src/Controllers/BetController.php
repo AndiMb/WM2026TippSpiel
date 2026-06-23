@@ -34,11 +34,17 @@ final class BetController
         Auth::requireLogin();
         $uid = Auth::id();
 
+        // Auto-Speichern schickt die Tipps per fetch() -> JSON statt Redirect.
+        $ajax = !empty($_POST['ajax']);
+
         // Erwartet Arrays: pred1[matchId], pred2[matchId]
         $pred1 = $_POST['pred1'] ?? [];
         $pred2 = $_POST['pred2'] ?? [];
 
         if (!is_array($pred1) || !is_array($pred2)) {
+            if ($ajax) {
+                View::json(['ok' => false, 'error' => t('flash.bets_invalid')], 422);
+            }
             Session::flash('error', t('flash.bets_invalid'));
             redirect('/tippen');
         }
@@ -70,6 +76,10 @@ final class BetController
 
             Bet::save($uid, $matchId, $h, $a);
             $saved++;
+        }
+
+        if ($ajax) {
+            View::json(['ok' => true, 'saved' => $saved]);
         }
 
         Session::flash('success', $saved > 0
