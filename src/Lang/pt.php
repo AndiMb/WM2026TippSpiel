@@ -83,9 +83,10 @@ return [
     'standings.none'    => 'Ainda não há pontuação.',
     'standings.col_bonus' => 'Bónus',
     'standings.col_exact' => 'Exato',
+    'standings.col_diff' => 'Diferença',
     'standings.col_tendency' => 'Tendência',
     'standings.you'     => '(tu)',
-    'standings.legend'  => '<strong>Exato</strong> = resultado certo · <strong>Tendência</strong> = diferença/vencedor certo',
+    'standings.legend'  => '<strong>Exato</strong> = resultado certo · <strong>Diferença</strong> = diferença de golos certa · <strong>Tendência</strong> = vencedor/empate certo',
 
     // Palpites dos outros
     'tips.title'        => '👀 Palpites dos outros',

@@ -24,6 +24,7 @@
             <th class="num"><?= e(t('table.points')) ?></th>
             <?php if ($bonusEnabled): ?><th class="num hide-sm"><?= e(t('standings.col_bonus')) ?></th><?php endif; ?>
             <th class="num"><?= e(t('standings.col_exact')) ?></th>
+            <th class="num"><?= e(t('standings.col_diff')) ?></th>
             <th class="num"><?= e(t('standings.col_tendency')) ?></th>
         </tr>
     </thead>
@@ -36,6 +37,7 @@
             <td class="num"><strong><?= (int) $row['points'] ?></strong></td>
             <?php if ($bonusEnabled): ?><td class="num hide-sm"><?= (int) $row['bonus_pts'] ?></td><?php endif; ?>
             <td class="num"><?= (int) $row['exact'] ?></td>
+            <td class="num"><?= (int) $row['diff'] ?></td>
             <td class="num"><?= (int) $row['tendency'] ?></td>
         </tr>
     <?php endforeach; ?>

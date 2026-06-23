@@ -83,9 +83,10 @@ return [
     'standings.none'    => 'Noch keine Wertung vorhanden.',
     'standings.col_bonus' => 'Bonus',
     'standings.col_exact' => 'Exakt',
+    'standings.col_diff' => 'Differenz',
     'standings.col_tendency' => 'Tendenz',
     'standings.you'     => '(du)',
-    'standings.legend'  => '<strong>Exakt</strong> = genaues Ergebnis getroffen · <strong>Tendenz</strong> = richtige Tordifferenz/Sieger',
+    'standings.legend'  => '<strong>Exakt</strong> = genaues Ergebnis getroffen · <strong>Differenz</strong> = richtige Tordifferenz · <strong>Tendenz</strong> = richtiger Sieger/Remis',
 
     // Tipps der anderen
     'tips.title'        => '👀 Tipps der anderen',

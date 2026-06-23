@@ -27,6 +27,7 @@ final class StandingsService
         $mode         = Setting::get('scoring_mode');
         $bonusEnabled = Setting::bool('bonus_enabled');
         $pointsExact  = Setting::int('points_exact');
+        $pointsDiff   = Setting::int('points_diff');
 
         $players = DB::all("SELECT id, display_name, joined_at FROM users WHERE is_active = 1");
 
@@ -47,19 +48,22 @@ final class StandingsService
                 "SELECT
                     COALESCE(SUM(b.points), 0)                              AS pts,
                     COALESCE(SUM(CASE WHEN b.points = ? THEN 1 ELSE 0 END), 0) AS exact_cnt,
+                    COALESCE(SUM(CASE WHEN b.points = ? THEN 1 ELSE 0 END), 0) AS diff_cnt,
                     COALESCE(SUM(CASE WHEN b.points > 0 THEN 1 ELSE 0 END), 0) AS hit_cnt,
                     COUNT(b.id)                                            AS bet_cnt
                  FROM bets b
                  JOIN matches m ON m.id = b.match_id
                  WHERE b.user_id = ? AND m.status = 'finished'
                    AND b.points IS NOT NULL $joinFilter",
-                array_merge([$pointsExact], $params)
+                array_merge([$pointsExact, $pointsDiff], $params)
             );
 
             $points  = (int) ($stat['pts'] ?? 0);
             $exact   = (int) ($stat['exact_cnt'] ?? 0);
-            // "Richtige Tendenzen" = Tipps mit Punkten, die kein exaktes Ergebnis waren.
-            $tendency = (int) ($stat['hit_cnt'] ?? 0) - $exact;
+            $diff    = (int) ($stat['diff_cnt'] ?? 0);
+            // "Richtige Tendenzen" = Tipps mit Punkten, die weder exakt noch
+            // richtige Tordifferenz waren.
+            $tendency = (int) ($stat['hit_cnt'] ?? 0) - $exact - $diff;
             $betCount = (int) ($stat['bet_cnt'] ?? 0);
 
             // Bonuspunkte addieren (wenn aktiviert).
@@ -78,22 +82,23 @@ final class StandingsService
                 'match_pts' => $points,
                 'bonus_pts' => $bonusPts,
                 'exact'     => $exact,
+                'diff'      => $diff,
                 'tendency'  => $tendency,
                 'bets'      => $betCount,
             ];
         }
 
-        // Sortierung: Punkte > exakte > Tendenzen > Name.
+        // Sortierung: Punkte > exakte > Tordifferenz > Tendenzen > Name.
         usort($rows, function ($a, $b) {
-            return [$b['points'], $b['exact'], $b['tendency'], $a['name']]
-               <=> [$a['points'], $a['exact'], $a['tendency'], $b['name']];
+            return [$b['points'], $b['exact'], $b['diff'], $b['tendency'], $a['name']]
+               <=> [$a['points'], $a['exact'], $a['diff'], $a['tendency'], $b['name']];
         });
 
         // Plätze vergeben (gleiche Werte = gleicher Platz).
         $rank = 0; $shown = 0; $prev = null;
         foreach ($rows as &$r) {
             $shown++;
-            $key = [$r['points'], $r['exact'], $r['tendency']];
+            $key = [$r['points'], $r['exact'], $r['diff'], $r['tendency']];
             if ($key !== $prev) {
                 $rank = $shown;
                 $prev = $key;
