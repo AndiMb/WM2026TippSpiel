@@ -70,6 +70,10 @@ return [
     'bets.save'         => '✅ Guardar palpites',
     'bets.hint_last'    => 'último',
     'bets.hint_vs'      => 'vs',
+    'bets.autosave'     => '💾 Os teus palpites são guardados automaticamente.',
+    'bets.saving'       => 'A guardar …',
+    'bets.saved'        => '✓ Guardado',
+    'bets.save_error'   => '⚠ Não guardado – toca em „Guardar palpites"',
 
     // Classificação
     'standings.title'   => '🏆 Classificação',
@@ -141,6 +145,10 @@ return [
     'tour.group_third'  => '3.º do grupo :grps',
     'tour.prev_round'   => 'Ronda anterior',
     'tour.next_round'   => 'Ronda seguinte',
+    'tour.open'         => 'Por definir',
+    'tour.sim_hint'     => '💡 Toca numa equipa para escolher o vencedor – o quadro recalcula automaticamente.',
+    'tour.sim_reset'    => '↺ Repor simulação',
+    'tour.sim_badge'    => 'Simulação',
 
     // Nomes das rondas
     'round.Round of 32'           => 'Dezasseis-avos de final',

@@ -46,13 +46,19 @@ final class BracketService
             }
         }
 
-        // Sieger-Folgespiel je Spielnummer ermitteln (für "advances_to").
+        // Sieger-Folgespiel je Spielnummer ermitteln: wohin (Spielnummer) und in
+        // welchen Slot (1 oder 2) der Sieger kommt – für Linien & Simulation.
         $advancesTo = [];
         foreach ($matches as $m) {
+            if ($m['num'] === null) {
+                continue;
+            }
+            $slotIdx = 1;
             foreach ([$m['team1'], $m['team2']] as $slot) {
                 if (preg_match('/^W(\d+)$/', (string) $slot, $mm)) {
-                    $advancesTo[(int) $mm[1]] = $m['num'] !== null ? (int) $m['num'] : null;
+                    $advancesTo[(int) $mm[1]] = ['to' => (int) $m['num'], 'slot' => $slotIdx];
                 }
+                $slotIdx++;
             }
         }
 
@@ -77,15 +83,25 @@ final class BracketService
                 $rounds[$round] = ['name' => $round ?: 'KO', 'matches' => []];
             }
             $num = $m['num'] !== null ? (int) $m['num'] : null;
+
+            // Welcher Slot wird aus welchem Vorspiel gespeist (W##)?
+            $feed1 = preg_match('/^W(\d+)$/', (string) $m['team1'], $x1) ? (int) $x1[1] : null;
+            $feed2 = preg_match('/^W(\d+)$/', (string) $m['team2'], $x2) ? (int) $x2[1] : null;
+
+            $t1 = self::resolve($m['team1'], $standings, $byNum); $t1['feedFrom'] = $feed1;
+            $t2 = self::resolve($m['team2'], $standings, $byNum); $t2['feedFrom'] = $feed2;
+
+            $feeds = $num !== null ? ($advancesTo[$num] ?? null) : null;
             $rounds[$round]['matches'][] = [
                 'num'         => $num,
-                'team1'       => self::resolve($m['team1'], $standings, $byNum),
-                'team2'       => self::resolve($m['team2'], $standings, $byNum),
+                'team1'       => $t1,
+                'team2'       => $t2,
                 'score1'      => $m['score1'],
                 'score2'      => $m['score2'],
                 'status'      => $m['status'],
                 'kickoff'     => $m['kickoff'],
-                'advances_to' => $num !== null ? ($advancesTo[$num] ?? null) : null,
+                'feeds'       => $feeds,                              // ['to'=>num,'slot'=>1|2]
+                'advances_to' => $feeds['to'] ?? null,
                 '_order'      => $num !== null ? ($order[$num] ?? PHP_INT_MAX) : PHP_INT_MAX,
             ];
         }
@@ -170,7 +186,8 @@ final class BracketService
             if ($team !== null) {
                 return ['type' => 'team', 'en' => $team];
             }
-            return ['type' => 'label', 'kind' => $isWinner ? 'winner_of' : 'loser_of', 'num' => $ref];
+            // Noch nicht entschieden -> "offener" Slot (wird per Simulation gefüllt).
+            return ['type' => 'open', 'kind' => $isWinner ? 'winner_of' : 'loser_of', 'num' => $ref];
         }
 
         // Sonst: echtes Team (bereits aufgelöst durch die Quelle).

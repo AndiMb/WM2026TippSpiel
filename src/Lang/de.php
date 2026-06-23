@@ -70,6 +70,10 @@ return [
     'bets.save'         => '✅ Tipps speichern',
     'bets.hint_last'    => 'zuletzt',
     'bets.hint_vs'      => 'gg.',
+    'bets.autosave'     => '💾 Deine Tipps werden automatisch gespeichert.',
+    'bets.saving'       => 'Speichert …',
+    'bets.saved'        => '✓ Gespeichert',
+    'bets.save_error'   => '⚠ Nicht gespeichert – bitte „Tipps speichern" antippen',
 
     // Rangliste
     'standings.title'   => '🏆 Rangliste',
@@ -141,6 +145,10 @@ return [
     'tour.group_third'  => '3. aus Gruppe :grps',
     'tour.prev_round'   => 'Vorherige Runde',
     'tour.next_round'   => 'Nächste Runde',
+    'tour.open'         => 'Noch offen',
+    'tour.sim_hint'     => '💡 Tippe auf eine Mannschaft, um den Sieger zu wählen – der Baum rechnet automatisch weiter.',
+    'tour.sim_reset'    => '↺ Simulation zurücksetzen',
+    'tour.sim_badge'    => 'Simulation',
 
     // KO-Rundennamen (Quelle -> Anzeige)
     'round.Round of 32'           => 'Sechzehntelfinale',
