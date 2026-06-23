@@ -388,7 +388,29 @@ body {
 .bracket-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
 .sim-hint { margin: 0; font-size: 13px; }
 
+/* Runden-Buttons: direkt zu einer Stufe springen. Klebt oben, bleibt erreichbar. */
+.round-tabs {
+    position: sticky; top: 0; z-index: 5;
+    display: flex; gap: 6px; overflow-x: auto; padding: 8px 0;
+    background: var(--bg); -webkit-overflow-scrolling: touch;
+}
+.round-tab {
+    flex: 0 0 auto; border: 2px solid var(--border); background: #fff; color: var(--ink);
+    border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 700;
+    cursor: pointer; min-height: 40px; white-space: nowrap;
+}
+.round-tab.is-active { background: var(--green); border-color: var(--green); color: #fff; }
+
 .bracket-scroll { overflow-x: auto; max-width: 100%; padding-bottom: 10px; -webkit-overflow-scrolling: touch; }
+
+/* Desktop: Der Baum darf die volle Bildschirmbreite nutzen (aus dem 760px-
+   Container ausbrechen), damit möglichst viele Runden gleichzeitig sichtbar sind
+   und kaum noch seitlich gescrollt werden muss. Zusätzlich feste Höhe, damit der
+   waagerechte Scrollbalken immer unten erreichbar ist. */
+@media (min-width: 800px) {
+    .bracket-wide { width: 94vw; margin-left: calc(50% - 47vw); }
+    .bracket-scroll { max-height: 76vh; overflow: auto; }
+}
 
 /* Der Baum: Runden nebeneinander, alle gleich hoch (align-items: stretch). */
 .bracket { position: relative; display: flex; gap: 0; min-width: min-content; }

@@ -8,7 +8,7 @@ $lang = \App\Core\Lang::locale();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1b8a5a">
     <title><?= e($title) ?> · <?= e(config('app.name')) ?></title>
-    <link rel="stylesheet" href="<?= e(url('/assets/css/style.css')) ?>?v=4">
+    <link rel="stylesheet" href="<?= e(url('/assets/css/style.css')) ?>?v=5">
     <link rel="icon" href="<?= e(url('/assets/img/favicon.svg')) ?>" type="image/svg+xml">
 </head>
 <body>
@@ -67,6 +67,6 @@ $lang = \App\Core\Lang::locale();
 </nav>
 <?php endif; ?>
 
-<script src="<?= e(url('/assets/js/app.js')) ?>?v=4" defer></script>
+<script src="<?= e(url('/assets/js/app.js')) ?>?v=5" defer></script>
 </body>
 </html>

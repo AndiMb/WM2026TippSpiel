@@ -200,6 +200,44 @@
         window.addEventListener('resize', function () {
             clearTimeout(rt); rt = setTimeout(drawLines, 150);
         });
+
+        // --- Runden-Buttons: horizontal zur gewählten Stufe springen ---
+        var scroller = document.getElementById('bracket-scroll');
+        var tabsEl = document.getElementById('round-tabs');
+        if (scroller && tabsEl) {
+            var rounds = bracket.querySelectorAll('.bracket-round');
+            var tabBtns = tabsEl.querySelectorAll('.round-tab');
+            var setActiveTab = function (idx) {
+                tabBtns.forEach(function (b) {
+                    b.classList.toggle('is-active', parseInt(b.dataset.idx, 10) === idx);
+                });
+            };
+            tabBtns.forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var idx = parseInt(btn.dataset.idx, 10);
+                    var target = rounds[idx];
+                    if (!target) return;
+                    var delta = target.getBoundingClientRect().left - scroller.getBoundingClientRect().left;
+                    scroller.scrollLeft = scroller.scrollLeft + delta;   // direkt = zuverlässig
+                    setActiveTab(idx);
+                });
+            });
+            // Beim horizontalen Scrollen die sichtbare Runde als aktiv markieren.
+            var st = false;
+            scroller.addEventListener('scroll', function () {
+                if (st) return; st = true;
+                window.requestAnimationFrame(function () {
+                    var left = scroller.getBoundingClientRect().left + 40;
+                    var best = 0, bestD = Infinity;
+                    rounds.forEach(function (r, i) {
+                        var d = Math.abs(r.getBoundingClientRect().left - left);
+                        if (d < bestD) { bestD = d; best = i; }
+                    });
+                    setActiveTab(best);
+                    st = false;
+                });
+            }, { passive: true });
+        }
     }
 
     function escapeHtml(s) {
