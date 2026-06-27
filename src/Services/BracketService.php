@@ -71,6 +71,9 @@ final class BracketService
         }
 
         $standings = GroupsService::standings();
+        // Zuordnung der besten Gruppendritten zu den acht Sechzehntelfinal-
+        // Spielen (Spielnummer => Gruppenbuchstabe); leer, solange unklar.
+        $thirdMap = ThirdPlaceService::mapping($standings);
 
         // Runden aufbauen.
         $rounds = [];
@@ -88,8 +91,8 @@ final class BracketService
             $feed1 = preg_match('/^W(\d+)$/', (string) $m['team1'], $x1) ? (int) $x1[1] : null;
             $feed2 = preg_match('/^W(\d+)$/', (string) $m['team2'], $x2) ? (int) $x2[1] : null;
 
-            $t1 = self::resolve($m['team1'], $standings, $byNum); $t1['feedFrom'] = $feed1;
-            $t2 = self::resolve($m['team2'], $standings, $byNum); $t2['feedFrom'] = $feed2;
+            $t1 = self::resolve($m['team1'], $standings, $byNum, $num, $thirdMap); $t1['feedFrom'] = $feed1;
+            $t2 = self::resolve($m['team2'], $standings, $byNum, $num, $thirdMap); $t2['feedFrom'] = $feed2;
 
             $feeds = $num !== null ? ($advancesTo[$num] ?? null) : null;
             $rounds[$round]['matches'][] = [
@@ -157,9 +160,11 @@ final class BracketService
     /**
      * Löst einen Mannschafts-Platzhalter auf.
      *
+     * @param ?int $matchNum Spielnummer dieses KO-Spiels (für die Dritten-Zuordnung)
+     * @param array<int,string> $thirdMap Spielnummer => Gruppenbuchstabe des Dritten
      * @return array{type:string, en?:string, proj?:bool, kind?:string, grp?:string, grps?:string, num?:int, label?:string}
      */
-    private static function resolve(string $token, array $standings, array $byNum): array
+    private static function resolve(string $token, array $standings, array $byNum, ?int $matchNum = null, array $thirdMap = []): array
     {
         $token = trim($token);
 
@@ -173,8 +178,17 @@ final class BracketService
             return ['type' => 'label', 'kind' => $pos === 1 ? 'group_winner' : 'group_second', 'grp' => $mm[2]];
         }
 
-        // 3A/B/C/D/F -> einer der besten Gruppendritten (nicht eindeutig)
+        // 3A/B/C/D/F -> einer der besten Gruppendritten.
         if (preg_match('#^3([A-L])(?:/[A-L])+$#', $token)) {
+            // Steht die Achtergruppe der besten Dritten fest, ist über die
+            // FIFA-Zuordnungstabelle bekannt, welcher Gruppendritte hierher
+            // kommt -> als (voraussichtliches) Team anzeigen.
+            if ($matchNum !== null && isset($thirdMap[$matchNum])) {
+                $team = GroupsService::teamAt($standings, $thirdMap[$matchNum], 3);
+                if ($team !== null && self::isRealTeam($team)) {
+                    return ['type' => 'team', 'en' => $team, 'proj' => true];
+                }
+            }
             return ['type' => 'label', 'kind' => 'group_third', 'grps' => substr($token, 1)];
         }
 

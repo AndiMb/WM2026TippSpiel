@@ -25,7 +25,9 @@ App-Installation.
   Spielergebnis, damit auch Kinder Anhaltspunkte für ihren Tipp haben.
 * **Gruppen & Turnierbaum** – Live-Gruppentabellen, beste Gruppendritte und ein
   KO-Turnierbaum mit Runden-Tabs und stufenweisem Wischen (Handy). Das
-  Sechzehntelfinale zeigt die Paarungen laut aktuellem Tabellenstand.
+  Sechzehntelfinale zeigt die Paarungen laut aktuellem Tabellenstand – inklusive
+  der acht besten Gruppendritten, die über die offizielle FIFA-Zuordnungstabelle
+  ihrem jeweiligen Spiel zugeordnet werden, sobald die Achtergruppe feststeht.
 * **Tipps der anderen** – Übersicht aller Mitspieler-Tipps, fair erst **nach
   Anpfiff** sichtbar.
 * **Sichere Updates** – versioniertes Migrationssystem; bestehende Daten bleiben
