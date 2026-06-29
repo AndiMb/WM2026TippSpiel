@@ -86,13 +86,15 @@ final class MatchModel
     {
         return DB::insert(
             'INSERT INTO matches
-                (ext_key, num, stage, round_name, group_name, team1, team2, kickoff, venue, score1, score2, status, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                (ext_key, num, stage, round_name, group_name, team1, team2, kickoff, venue, score1, score2, status, et1, et2, pen1, pen2, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 $m['ext_key'] ?? null, $m['num'] ?? null, $m['stage'] ?? 'group', $m['round_name'] ?? null,
                 $m['group_name'] ?? null, $m['team1'], $m['team2'], $m['kickoff'],
                 $m['venue'] ?? null, $m['score1'] ?? null, $m['score2'] ?? null,
-                $m['status'] ?? 'scheduled', DB::now(),
+                $m['status'] ?? 'scheduled',
+                $m['et1'] ?? null, $m['et2'] ?? null, $m['pen1'] ?? null, $m['pen2'] ?? null,
+                DB::now(),
             ]
         );
     }
@@ -102,22 +104,32 @@ final class MatchModel
         DB::run(
             'UPDATE matches SET
                 num = ?, stage = ?, round_name = ?, group_name = ?, team1 = ?, team2 = ?,
-                kickoff = ?, venue = ?, score1 = ?, score2 = ?, status = ?, updated_at = ?
+                kickoff = ?, venue = ?, score1 = ?, score2 = ?, status = ?,
+                et1 = ?, et2 = ?, pen1 = ?, pen2 = ?, updated_at = ?
              WHERE id = ?',
             [
                 $m['num'] ?? null, $m['stage'] ?? 'group', $m['round_name'] ?? null, $m['group_name'] ?? null,
                 $m['team1'], $m['team2'], $m['kickoff'], $m['venue'] ?? null,
                 $m['score1'] ?? null, $m['score2'] ?? null, $m['status'] ?? 'scheduled',
+                $m['et1'] ?? null, $m['et2'] ?? null, $m['pen1'] ?? null, $m['pen2'] ?? null,
                 DB::now(), $id,
             ]
         );
     }
 
-    /** Nur das Ergebnis/den Status setzen (manuell oder per API). */
-    public static function setResult(int $id, ?int $score1, ?int $score2, string $status): void
+    /**
+     * Nur das Ergebnis/den Status setzen (manuell oder per API).
+     * et1/et2 = Stand nach Verlängerung, pen1/pen2 = Elfmeterschießen
+     * (jeweils NULL, wenn nicht zutreffend).
+     */
+    public static function setResult(int $id, ?int $score1, ?int $score2, string $status,
+        ?int $et1 = null, ?int $et2 = null, ?int $pen1 = null, ?int $pen2 = null): void
     {
-        DB::run('UPDATE matches SET score1 = ?, score2 = ?, status = ?, updated_at = ? WHERE id = ?',
-            [$score1, $score2, $status, DB::now(), $id]);
+        DB::run(
+            'UPDATE matches SET score1 = ?, score2 = ?, status = ?,
+                et1 = ?, et2 = ?, pen1 = ?, pen2 = ?, updated_at = ? WHERE id = ?',
+            [$score1, $score2, $status, $et1, $et2, $pen1, $pen2, DB::now(), $id]
+        );
     }
 
     public static function count(): int

@@ -88,6 +88,7 @@ Aktueller Migrationsstand:
 | `002_teams` | Tabelle `teams` (deutsche Namen + FIFA-Rang). |
 | `003_match_num` | Spalte `matches.num` (offizielle Spielnummer; nötig für den Turnierbaum). |
 | `004_i18n` | Spalte `users.locale` (Sprache je Benutzer) + `teams.name_pt` (portugiesische Namen). |
+| `005_ko_extra_time` | Spalten `matches.et1/et2` (Verlängerung) + `pen1/pen2` (Elfmeterschießen); damit rückt im Turnierbaum der Sieger eines erst n.V./i.E. entschiedenen Spiels korrekt nach. |
 
 > Bei einer Installation, die es **vor** dem Migrationssystem gab, erkennt der
 > Runner die vorhandenen Tabellen automatisch (dank `CREATE TABLE IF NOT EXISTS`)
