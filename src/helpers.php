@@ -89,6 +89,53 @@ function t(string $key, array $params = []): string
     return \App\Core\Lang::t($key, $params);
 }
 
+/**
+ * Ermittelt, ob ein KO-Spiel erst in der Verlängerung oder im Elfmeterschießen
+ * entschieden wurde – für den Hinweis „n.V." / „i.E." neben dem Ergebnis.
+ *
+ * Erwartet eine Spiel-Zeile mit score1/score2 (90 Min.) sowie optional
+ * et1/et2 (Verlängerung) und pen1/pen2 (Elfmeter).
+ *
+ * @return 'et'|'pen'|null  'et' = nach Verlängerung, 'pen' = im Elfmeterschießen
+ */
+function ko_decider(array $m): ?string
+{
+    $s1 = $m['score1'] ?? null;
+    $s2 = $m['score2'] ?? null;
+    if ($s1 === null || $s2 === null || (int) $s1 !== (int) $s2) {
+        return null; // kein Ergebnis oder bereits nach 90 Minuten entschieden
+    }
+    $et1 = $m['et1'] ?? null;
+    $et2 = $m['et2'] ?? null;
+    if ($et1 !== null && $et2 !== null && (int) $et1 !== (int) $et2) {
+        return 'et';
+    }
+    $p1 = $m['pen1'] ?? null;
+    $p2 = $m['pen2'] ?? null;
+    if ($p1 !== null && $p2 !== null && (int) $p1 !== (int) $p2) {
+        return 'pen';
+    }
+    return null;
+}
+
+/**
+ * Kleines Badge „n.V." / „i.E." (mit Tooltip) für ein KO-Spiel; leer, wenn das
+ * Spiel regulär entschieden wurde.
+ */
+function ko_decided_badge(array $m): string
+{
+    $dec = ko_decider($m);
+    if ($dec === null) {
+        return '';
+    }
+    $title = t('match.' . $dec . '_full');
+    if ($dec === 'pen' && isset($m['pen1'], $m['pen2'])) {
+        $title .= ' ' . (int) $m['pen1'] . ':' . (int) $m['pen2'];
+    }
+    return ' <span class="decided decided-' . $dec . '" title="' . e($title) . '">'
+        . e(t('match.' . $dec)) . '</span>';
+}
+
 /** Anzeigename einer Mannschaft in der aktuellen Sprache (Fallback: Original). */
 function tname(?string $en): string
 {

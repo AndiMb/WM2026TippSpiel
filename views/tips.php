@@ -21,7 +21,7 @@
                 </div>
                 <div class="tip-res">
                     <?php if ($finished): ?>
-                        <span class="score-final"><?= (int) $m['score1'] ?>:<?= (int) $m['score2'] ?></span>
+                        <span class="score-final"><?= (int) $m['score1'] ?>:<?= (int) $m['score2'] ?><?= ko_decided_badge($m) ?></span>
                     <?php else: ?>
                         <span class="status status-live"><?= e(t('tips.live')) ?></span>
                     <?php endif; ?>

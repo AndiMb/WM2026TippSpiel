@@ -18,6 +18,12 @@ return [
     'common.clock'      => '',
     'common.points_short' => 'P',
 
+    // Jogos a eliminar: decididos no prolongamento / nos penáltis
+    'match.et'       => 'a.p.',
+    'match.et_full'  => 'após prolongamento',
+    'match.pen'      => 'g.p.',
+    'match.pen_full' => 'nas grandes penalidades',
+
     // Início de sessão
     'login.subtitle'    => 'Inicia sessão',
     'login.username'    => 'Utilizador',

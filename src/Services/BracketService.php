@@ -101,6 +101,10 @@ final class BracketService
                 'team2'       => $t2,
                 'score1'      => $m['score1'],
                 'score2'      => $m['score2'],
+                'et1'         => $m['et1'] ?? null,
+                'et2'         => $m['et2'] ?? null,
+                'pen1'        => $m['pen1'] ?? null,
+                'pen2'        => $m['pen2'] ?? null,
                 'status'      => $m['status'],
                 'kickoff'     => $m['kickoff'],
                 'feeds'       => $feeds,                              // ['to'=>num,'slot'=>1|2]
@@ -218,16 +222,36 @@ final class BracketService
         if (!$m || $m['status'] !== 'finished' || $m['score1'] === null || $m['score2'] === null) {
             return null;
         }
-        $s1 = (int) $m['score1'];
-        $s2 = (int) $m['score2'];
-        if ($s1 === $s2) {
-            return null; // Unentschieden -> Sieger steht hier nicht fest (Elfmeter)
-        }
         if (!self::isRealTeam($m['team1']) || !self::isRealTeam($m['team2'])) {
             return null;
         }
-        $homeWon = $s1 > $s2;
+        $homeWon = self::homeAdvances($m);
+        if ($homeWon === null) {
+            return null; // Sieger steht (noch) nicht fest
+        }
         return ($winner === $homeWon) ? $m['team1'] : $m['team2'];
+    }
+
+    /**
+     * Wer kommt weiter? Reihenfolge: 90 Minuten -> Verlängerung -> Elfmeter.
+     * Liefert true (Heim), false (Auswärts) oder null, wenn (noch) unklar.
+     */
+    private static function homeAdvances(array $m): ?bool
+    {
+        $s1 = (int) $m['score1'];
+        $s2 = (int) $m['score2'];
+        if ($s1 !== $s2) {
+            return $s1 > $s2;
+        }
+        // Unentschieden nach 90 Minuten -> Verlängerung.
+        if (isset($m['et1'], $m['et2']) && (int) $m['et1'] !== (int) $m['et2']) {
+            return (int) $m['et1'] > (int) $m['et2'];
+        }
+        // Weiterhin unentschieden -> Elfmeterschießen.
+        if (isset($m['pen1'], $m['pen2']) && (int) $m['pen1'] !== (int) $m['pen2']) {
+            return (int) $m['pen1'] > (int) $m['pen2'];
+        }
+        return null;
     }
 
     /** Heuristik: ein echter Teamname ist KEIN Platzhalter-Code. */

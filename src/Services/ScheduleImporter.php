@@ -89,7 +89,7 @@ final class ScheduleImporter
             }
 
             $kickoff = self::toUtc($m['date'] ?? '', $m['time'] ?? null);
-            [$s1, $s2, $status] = self::extractScore($m['score'] ?? null);
+            $sc = self::extractScore($m['score'] ?? null);
 
             $group = $m['group'] ?? null;
             $num   = isset($m['num']) ? (int) $m['num'] : null;  // Spielnummer (KO-Phase)
@@ -103,9 +103,13 @@ final class ScheduleImporter
                 'team2'      => $team2,
                 'kickoff'    => $kickoff,
                 'venue'      => $m['ground'] ?? ($m['city'] ?? null),
-                'score1'     => $s1,
-                'score2'     => $s2,
-                'status'     => $status,
+                'score1'     => $sc['s1'],
+                'score2'     => $sc['s2'],
+                'status'     => $sc['status'],
+                'et1'        => $sc['et1'],
+                'et2'        => $sc['et2'],
+                'pen1'       => $sc['pen1'],
+                'pen2'       => $sc['pen2'],
             ];
         }
         return $out;
@@ -221,6 +225,10 @@ final class ScheduleImporter
                 $m['score1'] = $existing['score1'];
                 $m['score2'] = $existing['score2'];
                 $m['status']  = 'finished';
+                $m['et1']  = $existing['et1']  ?? null;
+                $m['et2']  = $existing['et2']  ?? null;
+                $m['pen1'] = $existing['pen1'] ?? null;
+                $m['pen2'] = $existing['pen2'] ?? null;
             }
 
             MatchModel::updateFromImport((int) $existing['id'], $m);
@@ -255,15 +263,38 @@ final class ScheduleImporter
         return trim((string) $team);
     }
 
-    /** Endergebnis aus score-Objekt lesen -> [score1, score2, status]. */
+    /**
+     * Liest das Ergebnis aus dem OpenFootball-score-Objekt.
+     *
+     * Format: { "ht":[..], "ft":[..], "et":[..], "p":[..] }
+     *   ft = Stand nach 90 Minuten (regulär)  -> score1/score2 (Tipp-Wertung)
+     *   et = Stand nach Verlängerung          -> et1/et2 (nur bei Verlängerung)
+     *   p  = Elfmeterschießen                 -> pen1/pen2 (nur bei Elfmeter)
+     *
+     * @return array{s1:?int,s2:?int,status:string,et1:?int,et2:?int,pen1:?int,pen2:?int}
+     */
     private static function extractScore($score): array
     {
-        if (is_array($score) && isset($score['ft']) && is_array($score['ft'])
-            && count($score['ft']) === 2
-            && $score['ft'][0] !== null && $score['ft'][1] !== null) {
-            return [(int) $score['ft'][0], (int) $score['ft'][1], 'finished'];
+        $empty = ['s1' => null, 's2' => null, 'status' => 'scheduled',
+                  'et1' => null, 'et2' => null, 'pen1' => null, 'pen2' => null];
+        if (!is_array($score)) {
+            return $empty;
         }
-        return [null, null, 'scheduled'];
+        $ft = $score['ft'] ?? null;
+        if (!is_array($ft) || count($ft) !== 2 || $ft[0] === null || $ft[1] === null) {
+            return $empty;
+        }
+        // Ein Wertepaar lesen (oder [null, null], wenn nicht vorhanden).
+        $pair = static function ($v): array {
+            return (is_array($v) && count($v) === 2 && $v[0] !== null && $v[1] !== null)
+                ? [(int) $v[0], (int) $v[1]]
+                : [null, null];
+        };
+        [$et1, $et2]   = $pair($score['et'] ?? null);
+        [$pen1, $pen2] = $pair($score['p'] ?? null);
+
+        return ['s1' => (int) $ft[0], 's2' => (int) $ft[1], 'status' => 'finished',
+                'et1' => $et1, 'et2' => $et2, 'pen1' => $pen1, 'pen2' => $pen2];
     }
 
     /** Stabiler Schlüssel zur Duplikaterkennung. */

@@ -84,7 +84,7 @@ $side = function (array $bm, int $slot) use ($sideContent): string {
 $renderMatch = function (array $bm) use ($side): string {
     ob_start(); ?>
     <div class="ko-match" data-num="<?= (int) $bm['num'] ?>">
-        <div class="ko-time"><?= e(fmt_datetime($bm['kickoff'], 'd.m. H:i')) ?></div>
+        <div class="ko-time"><?= e(fmt_datetime($bm['kickoff'], 'd.m. H:i')) ?><?= ko_decided_badge($bm) ?></div>
         <?= $side($bm, 1) ?>
         <?= $side($bm, 2) ?>
     </div>

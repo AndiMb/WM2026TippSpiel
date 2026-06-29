@@ -79,6 +79,12 @@ App-Installation.
 
 Sortierung der Rangliste: **Punkte → exakte Ergebnisse → richtige Tendenzen**.
 
+> In der K.-o.-Phase wird – wie bei den meisten Tippspielen – auf den **Stand
+> nach 90 Minuten** gewertet. Eine Verlängerung oder ein Elfmeterschießen ändert
+> den Tipp also nicht (es bleibt das reguläre Ergebnis bzw. ein Remis). Im
+> Turnierbaum rückt der Sieger trotzdem korrekt nach; solche Spiele sind mit
+> **„n.V."** (nach Verlängerung) bzw. **„i.E."** (im Elfmeterschießen) markiert.
+
 ---
 
 ## 🚀 Schnellstart

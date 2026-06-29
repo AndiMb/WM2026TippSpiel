@@ -77,10 +77,39 @@ final class MatchController
             redirect('/admin/spiele');
         }
 
-        MatchModel::setResult($id, (int) $s1, (int) $s2, 'finished');
+        // Optional: Verlängerung (n.V.) und Elfmeterschießen (i.E.) für KO-Spiele.
+        // Jeweils nur gültig, wenn beide Felder eines Paares gefüllt sind.
+        [$et1, $et2, $okEt]   = self::scorePair($_POST['et1'] ?? '', $_POST['et2'] ?? '');
+        [$pen1, $pen2, $okPen] = self::scorePair($_POST['pen1'] ?? '', $_POST['pen2'] ?? '');
+        if (!$okEt || !$okPen) {
+            Session::flash('error', 'Bitte für Verlängerung/Elfmeter beide Torzahlen oder beide leer lassen.');
+            redirect('/admin/spiele');
+        }
+
+        MatchModel::setResult($id, (int) $s1, (int) $s2, 'finished', $et1, $et2, $pen1, $pen2);
         ScoringService::scoreMatch($id);   // Tipps sofort werten
         Session::flash('success', 'Ergebnis gespeichert und Tipps gewertet.');
         redirect('/admin/spiele');
+    }
+
+    /**
+     * Validiert ein optionales Tor-Paar (z.B. Verlängerung/Elfmeter).
+     * @return array{0:?int,1:?int,2:bool}  [tore1, tore2, gültig?]
+     *   Beide leer  -> [null, null, true]   (nicht zutreffend)
+     *   Beide Zahl  -> [a, b, true]
+     *   sonst       -> [null, null, false]  (ungültige Eingabe)
+     */
+    private static function scorePair($a, $b): array
+    {
+        $a = trim((string) $a);
+        $b = trim((string) $b);
+        if ($a === '' && $b === '') {
+            return [null, null, true];
+        }
+        if (ctype_digit($a) && ctype_digit($b)) {
+            return [(int) $a, (int) $b, true];
+        }
+        return [null, null, false];
     }
 
     /** Alle Punkte neu berechnen (z.B. nach Änderung des Punktesystems). */

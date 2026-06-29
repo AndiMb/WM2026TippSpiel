@@ -18,6 +18,12 @@ return [
     'common.clock'      => 'Uhr',
     'common.points_short' => 'P',
 
+    // KO-Spiele: in Verlängerung / Elfmeterschießen entschieden
+    'match.et'       => 'n.V.',
+    'match.et_full'  => 'nach Verlängerung',
+    'match.pen'      => 'i.E.',
+    'match.pen_full' => 'im Elfmeterschießen',
+
     // Login
     'login.subtitle'    => 'Bitte melde dich an',
     'login.username'    => 'Benutzername',

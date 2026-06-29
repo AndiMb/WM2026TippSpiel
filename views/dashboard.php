@@ -92,7 +92,7 @@
                 <div class="match-info">
                     <div class="match-teams">
                         <span class="team"><?= flag($m['team1']) ?> <?= e(tname($m['team1'])) ?></span>
-                        <span class="score-final"><?= (int) $m['score1'] ?>:<?= (int) $m['score2'] ?></span>
+                        <span class="score-final"><?= (int) $m['score1'] ?>:<?= (int) $m['score2'] ?><?= ko_decided_badge($m) ?></span>
                         <span class="team"><?= flag($m['team2']) ?> <?= e(tname($m['team2'])) ?></span>
                     </div>
                     <div class="match-meta"><?= e(fmt_datetime($m['kickoff'], 'd.m.Y')) ?></div>

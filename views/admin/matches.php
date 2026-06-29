@@ -67,6 +67,27 @@
                            name="score2" value="<?= $m['score2'] !== null ? (int) $m['score2'] : '' ?>" placeholder="–">
                     <button class="btn btn-small btn-primary" type="submit">OK</button>
                 </div>
+                <?php if (($m['stage'] ?? '') === 'knockout'): ?>
+                <div class="ma-extra">
+                    <span class="ma-extra-label" title="Nur ausfüllen, wenn es nach 90 Minuten unentschieden stand. Reguläres Ergebnis (oben) bleibt der 90-Minuten-Stand.">Verlängerung / Elfmeter:</span>
+                    <span class="ma-extra-grp" title="Stand nach Verlängerung (n.V.)">
+                        n.V.
+                        <input class="score-input score-input-sm" type="number" min="0" max="99"
+                               name="et1" value="<?= isset($m['et1']) && $m['et1'] !== null ? (int) $m['et1'] : '' ?>" placeholder="–">
+                        <span class="colon">:</span>
+                        <input class="score-input score-input-sm" type="number" min="0" max="99"
+                               name="et2" value="<?= isset($m['et2']) && $m['et2'] !== null ? (int) $m['et2'] : '' ?>" placeholder="–">
+                    </span>
+                    <span class="ma-extra-grp" title="Ergebnis Elfmeterschießen (i.E.)">
+                        i.E.
+                        <input class="score-input score-input-sm" type="number" min="0" max="99"
+                               name="pen1" value="<?= isset($m['pen1']) && $m['pen1'] !== null ? (int) $m['pen1'] : '' ?>" placeholder="–">
+                        <span class="colon">:</span>
+                        <input class="score-input score-input-sm" type="number" min="0" max="99"
+                               name="pen2" value="<?= isset($m['pen2']) && $m['pen2'] !== null ? (int) $m['pen2'] : '' ?>" placeholder="–">
+                    </span>
+                </div>
+                <?php endif; ?>
             </form>
         <?php endforeach; ?>
         </div>
