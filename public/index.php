@@ -20,6 +20,7 @@ use App\Controllers\AccountController;
 use App\Controllers\LegalController;
 use App\Controllers\Admin\AdminController;
 use App\Controllers\Admin\UserController;
+use App\Controllers\Admin\BetAdminController;
 use App\Controllers\Admin\MatchController;
 use App\Controllers\Admin\BonusController;
 use App\Controllers\Admin\SettingsController;
@@ -73,6 +74,9 @@ $router->post('/admin/benutzer',       [UserController::class, 'create']);
 $router->post('/admin/benutzer/{id}',  [UserController::class, 'update']);
 $router->post('/admin/benutzer/{id}/loeschen', [UserController::class, 'delete']);
 $router->post('/admin/benutzer/{id}/passwort', [UserController::class, 'resetPassword']);
+
+$router->get('/admin/tipps',           [BetAdminController::class, 'index']);
+$router->post('/admin/tipps',          [BetAdminController::class, 'save']);
 
 $router->get('/admin/spiele',          [MatchController::class, 'index']);
 $router->post('/admin/spiele/import',  [MatchController::class, 'import']);

@@ -78,6 +78,7 @@
             </form>
 
             <div class="user-actions">
+                <a class="btn btn-small" href="<?= e(url('/admin/tipps?user=' . (int) $u['id'])) ?>">📝 Tipps nachtragen</a>
                 <form method="post" action="<?= e(url('/admin/benutzer/' . (int) $u['id'] . '/passwort')) ?>" class="form-inline2">
                     <?= csrf_field() ?>
                     <input class="input input-sm" type="text" name="password" placeholder="Neues Passwort" minlength="6">
