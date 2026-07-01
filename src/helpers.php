@@ -119,8 +119,12 @@ function ko_decider(array $m): ?string
 }
 
 /**
- * Kleines Badge „n.V." / „i.E." (mit Tooltip) für ein KO-Spiel; leer, wenn das
- * Spiel regulär entschieden wurde.
+ * Kleines Badge mit dem Endergebnis eines nicht regulär entschiedenen KO-Spiels –
+ * z. B. „2:1 n.V." (Stand nach Verlängerung) oder „4:3 i.E." (Elfmeterschießen).
+ * Leer, wenn das Spiel bereits nach 90 Minuten entschieden wurde.
+ *
+ * Der 90-Minuten-Stand (für die Tipp-Wertung) wird weiterhin separat angezeigt;
+ * dieses Badge ergänzt das Gesamtendergebnis.
  */
 function ko_decided_badge(array $m): string
 {
@@ -128,12 +132,17 @@ function ko_decided_badge(array $m): string
     if ($dec === null) {
         return '';
     }
-    $title = t('match.' . $dec . '_full');
-    if ($dec === 'pen' && isset($m['pen1'], $m['pen2'])) {
-        $title .= ' ' . (int) $m['pen1'] . ':' . (int) $m['pen2'];
+    // Endstand: nach Verlängerung -> et-Ergebnis, im Elfmeterschießen -> pen-Ergebnis.
+    if ($dec === 'pen') {
+        $score = (int) $m['pen1'] . ':' . (int) $m['pen2'];
+    } else {
+        $score = (int) $m['et1'] . ':' . (int) $m['et2'];
     }
+    $label = $score . ' ' . t('match.' . $dec);
+    $title = t('match.' . $dec . '_full') . ' ' . $score;
+
     return ' <span class="decided decided-' . $dec . '" title="' . e($title) . '">'
-        . e(t('match.' . $dec)) . '</span>';
+        . e($label) . '</span>';
 }
 
 /** Anzeigename einer Mannschaft in der aktuellen Sprache (Fallback: Original). */
