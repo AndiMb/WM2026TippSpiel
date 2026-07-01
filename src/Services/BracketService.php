@@ -46,19 +46,28 @@ final class BracketService
             }
         }
 
+        // Sieger jedes bereits entschiedenen KO-Spiels (Mannschaftsname ->
+        // Spielnummern). Damit lässt sich die Baumstruktur auch dann noch
+        // rekonstruieren, wenn die Quelle die Platzhalter „W##" im Laufe des
+        // Turniers durch die echten Mannschaftsnamen ersetzt hat.
+        $winnerMatches = [];
+        foreach ($byNum as $n => $m) {
+            $adv = self::homeAdvances($m);
+            if ($adv === null
+                || !self::isRealTeam((string) $m['team1'])
+                || !self::isRealTeam((string) $m['team2'])) {
+                continue;
+            }
+            $winner = $adv ? (string) $m['team1'] : (string) $m['team2'];
+            $winnerMatches[$winner][] = (int) $n;
+        }
+
         // Sieger-Folgespiel je Spielnummer ermitteln: wohin (Spielnummer) und in
         // welchen Slot (1 oder 2) der Sieger kommt – für Linien & Simulation.
         $advancesTo = [];
-        foreach ($matches as $m) {
-            if ($m['num'] === null) {
-                continue;
-            }
-            $slotIdx = 1;
-            foreach ([$m['team1'], $m['team2']] as $slot) {
-                if (preg_match('/^W(\d+)$/', (string) $slot, $mm)) {
-                    $advancesTo[(int) $mm[1]] = ['to' => (int) $m['num'], 'slot' => $slotIdx];
-                }
-                $slotIdx++;
+        foreach ($byNum as $n => $m) {
+            foreach (self::winnerFeeders($m, $winnerMatches) as $slotIdx => $src) {
+                $advancesTo[$src] = ['to' => (int) $n, 'slot' => $slotIdx];
             }
         }
 
@@ -67,7 +76,7 @@ final class BracketService
         $finalNum = self::roundFirstNum($matches, 'Final');
         if ($finalNum !== null) {
             $leaf = 0;
-            self::placeInTree($finalNum, $byNum, $order, $leaf);
+            self::placeInTree($finalNum, $byNum, $order, $leaf, $winnerMatches);
         }
 
         $standings = GroupsService::standings();
@@ -87,9 +96,10 @@ final class BracketService
             }
             $num = $m['num'] !== null ? (int) $m['num'] : null;
 
-            // Welcher Slot wird aus welchem Vorspiel gespeist (W##)?
-            $feed1 = preg_match('/^W(\d+)$/', (string) $m['team1'], $x1) ? (int) $x1[1] : null;
-            $feed2 = preg_match('/^W(\d+)$/', (string) $m['team2'], $x2) ? (int) $x2[1] : null;
+            // Welcher Slot wird aus welchem Vorspiel gespeist (Sieger von …)?
+            $fed   = self::winnerFeeders($m, $winnerMatches);
+            $feed1 = $fed[1] ?? null;
+            $feed2 = $fed[2] ?? null;
 
             $t1 = self::resolve($m['team1'], $standings, $byNum, $num, $thirdMap); $t1['feedFrom'] = $feed1;
             $t2 = self::resolve($m['team2'], $standings, $byNum, $num, $thirdMap); $t2['feedFrom'] = $feed2;
@@ -138,17 +148,17 @@ final class BracketService
      * bekommen fortlaufende Werte, innere Knoten den Mittelwert ihrer Kinder –
      * so stehen zusammengehörende Paare zentriert untereinander.
      */
-    private static function placeInTree(int $num, array $byNum, array &$order, int &$leaf): float
+    private static function placeInTree(int $num, array $byNum, array &$order, int &$leaf, array $winnerMatches): float
     {
         $m = $byNum[$num] ?? null;
         if (!$m) {
             return $order[$num] = $leaf++;
         }
-        // Kinder = Spiele, auf die sich W##-Platzhalter beziehen.
+        // Kinder = Vorspiele, deren Sieger in dieses Spiel einlaufen.
         $children = [];
-        foreach ([$m['team1'], $m['team2']] as $slot) {
-            if (preg_match('/^W(\d+)$/', (string) $slot, $mm) && isset($byNum[(int) $mm[1]])) {
-                $children[] = (int) $mm[1];
+        foreach (self::winnerFeeders($m, $winnerMatches) as $src) {
+            if (isset($byNum[$src])) {
+                $children[] = $src;
             }
         }
         if (!$children) {
@@ -156,9 +166,54 @@ final class BracketService
         }
         $vals = [];
         foreach ($children as $c) {
-            $vals[] = self::placeInTree($c, $byNum, $order, $leaf);
+            $vals[] = self::placeInTree($c, $byNum, $order, $leaf, $winnerMatches);
         }
         return $order[$num] = (min($vals) + max($vals)) / 2;
+    }
+
+    /**
+     * Ermittelt die Vorspiele, deren Sieger in dieses Spiel einlaufen –
+     * als Slot-Index (1|2) => Quell-Spielnummer.
+     *
+     * Bevorzugt den Platzhalter „W##". Ist dieser von der Quelle bereits durch
+     * den echten Mannschaftsnamen ersetzt worden, wird das Vorspiel über die
+     * Sieger-Zuordnung rekonstruiert – so bleibt die Baumstruktur (Reihenfolge
+     * und Verbindungslinien) im gesamten Turnierverlauf stabil.
+     *
+     * @param array<string,array<int,int>> $winnerMatches Name => gewonnene Spielnummern
+     * @return array<int,int>
+     */
+    private static function winnerFeeders(array $m, array $winnerMatches): array
+    {
+        $self = ($m['num'] ?? null) !== null ? (int) $m['num'] : PHP_INT_MAX;
+        $out  = [];
+        $slotIdx = 1;
+        foreach ([$m['team1'], $m['team2']] as $slot) {
+            $slot = (string) $slot;
+            if (preg_match('/^W(\d+)$/', $slot, $mm)) {
+                $out[$slotIdx] = (int) $mm[1];
+            } elseif (self::isRealTeam($slot) && isset($winnerMatches[$slot])) {
+                // Platzhalter aufgelöst -> jüngstes gewonnenes Vorspiel vor diesem.
+                $src = self::latestBefore($winnerMatches[$slot], $self);
+                if ($src !== null) {
+                    $out[$slotIdx] = $src;
+                }
+            }
+            $slotIdx++;
+        }
+        return $out;
+    }
+
+    /** Größte Spielnummer aus $nums, die kleiner als $before ist (oder null). */
+    private static function latestBefore(array $nums, int $before): ?int
+    {
+        $best = null;
+        foreach ($nums as $n) {
+            if ($n < $before && ($best === null || $n > $best)) {
+                $best = $n;
+            }
+        }
+        return $best;
     }
 
     /**
