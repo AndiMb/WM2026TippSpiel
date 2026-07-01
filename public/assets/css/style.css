@@ -292,6 +292,12 @@ body {
 .status-finished  { background: var(--green-light); color: var(--green-dark); }
 .status-live      { background: #fde8e8; color: var(--red); }
 
+/* ---------- Tipps nachtragen (Admin) ---------- */
+.filter-toggle { display: flex; gap: 6px; flex-wrap: wrap; }
+.match-admin-row.is-missing { border-left: 3px solid var(--red); }
+.badge-missing { background: #fde8e8; color: var(--red); font-weight: 800; font-size: 11px; padding: 2px 6px; border-radius: 6px; }
+.form-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
+
 /* ---------- Tipps der anderen ---------- */
 .tip-block { padding: 12px 14px; }
 .tip-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }

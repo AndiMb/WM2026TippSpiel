@@ -48,7 +48,9 @@ App-Installation.
 * **Bonusfragen** (Weltmeister, Finalist, Torschützenkönig …), optional
   aktivierbar, mit konfigurierbaren Punkten.
 * **Adminbereich** – Benutzer, Spiele, Ergebnisse, Bonusfragen und Einstellungen
-  verwalten; Punkte neu berechnen.
+  verwalten; Punkte neu berechnen. **Tipps nachtragen**: für einzelne Spieler
+  verspätete Tipps ergänzen oder korrigieren (auch nach Anpfiff); bei beendeten
+  Spielen werden die Punkte sofort neu berechnet.
 * **Sicher** – Passwort-Hashing (`password_hash`), CSRF-Schutz, gehärtetes
   Session-Management, serverseitige Input-Validierung.
 * **Responsive & barrierearm** – mobil-first, hoher Kontrast, große Touch-Flächen.

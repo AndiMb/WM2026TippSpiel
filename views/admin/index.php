@@ -12,6 +12,7 @@
 <div class="admin-menu">
     <a class="admin-tile" href="<?= e(url('/admin/benutzer')) ?>"><span class="tile-ico">👥</span> Benutzer verwalten</a>
     <a class="admin-tile" href="<?= e(url('/admin/spiele')) ?>"><span class="tile-ico">📅</span> Spiele &amp; Ergebnisse</a>
+    <a class="admin-tile" href="<?= e(url('/admin/tipps')) ?>"><span class="tile-ico">📝</span> Tipps nachtragen</a>
     <a class="admin-tile" href="<?= e(url('/admin/bonus')) ?>"><span class="tile-ico">⭐</span> Bonusfragen</a>
     <a class="admin-tile" href="<?= e(url('/admin/einstellungen')) ?>"><span class="tile-ico">🛠️</span> Einstellungen</a>
 </div>
