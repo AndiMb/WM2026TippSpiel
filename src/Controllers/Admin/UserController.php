@@ -49,7 +49,8 @@ final class UserController
         }
 
         $locale = \App\Core\Lang::normalize((string) ($_POST['locale'] ?? 'de'));
-        User::create($username, $password, $displayName, $role, $locale);
+        $theme  = theme_normalize((string) ($_POST['theme'] ?? 'standard'));
+        User::create($username, $password, $displayName, $role, $locale, $theme);
         Session::flash('success', "Benutzer \"$displayName\" angelegt.");
         redirect('/admin/benutzer');
     }
@@ -75,7 +76,8 @@ final class UserController
         }
 
         $locale = \App\Core\Lang::normalize((string) ($_POST['locale'] ?? 'de'));
-        User::update($id, $displayName, $role, $isActive, $locale);
+        $theme  = theme_normalize((string) ($_POST['theme'] ?? 'standard'));
+        User::update($id, $displayName, $role, $isActive, $locale, $theme);
         Session::flash('success', 'Benutzer aktualisiert.');
         redirect('/admin/benutzer');
     }

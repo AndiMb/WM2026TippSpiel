@@ -1,0 +1,136 @@
+/* =====================================================================
+   Moderne Ansicht („modern") – Überschreibungs-Schicht auf style.css.
+   Ziel: dunkles, elegantes Design mit Verlaufs-Akzenten und dezenten
+   Animationen. Wird nur geladen, wenn der Benutzer diese Ansicht gewählt
+   hat (Konto → Ansicht); gleiche Selektoren gewinnen durch die
+   Ladereihenfolge. Animationen respektieren "prefers-reduced-motion".
+   ===================================================================== */
+
+:root {
+    --green:        #10b981;                  /* Akzent Smaragd */
+    --green-dark:   #34d399;                  /* helle Akzent-Schrift auf dunklem Grund */
+    --green-light:  rgba(16, 185, 129, .14);  /* Akzent-Fläche */
+    --blue:         #60a5fa;
+    --yellow:       #fbbf24;
+    --red:          #f87171;
+    --ink:          #e9eef6;
+    --muted:        #97a4b9;
+    --bg:           #0e1420;
+    --card:         #161e2e;
+    --border:       #27344b;
+    --shadow:       0 10px 30px rgba(0, 0, 0, .35);
+    --bracket-line: #34425e;
+}
+
+/* Heller Verlaufs-Akzent: dunkle Schrift für ausreichenden Kontrast. */
+.topbar {
+    background: linear-gradient(120deg, #0f172a, #115e59, #0f172a);
+    background-size: 220% 220%;
+    border-bottom: 1px solid var(--border);
+}
+
+/* ---------- Flächen & Bedienelemente ---------- */
+.btn { background: #1d2940; border-color: #33436199; color: var(--ink); }
+.btn-primary {
+    background: linear-gradient(135deg, #34d399, #22d3ee);
+    border-color: transparent; color: #071322;
+}
+.btn-primary:active { background: linear-gradient(135deg, #2cbd88, #1cbcd8); }
+.btn-danger { background: transparent; }
+
+.input, select.input, .score-input {
+    background: #101827; color: var(--ink); border-color: #33436199;
+}
+.input:focus, .score-input:focus {
+    outline: 3px solid rgba(96, 165, 250, .35); border-color: var(--blue);
+}
+
+/* ---------- Statistik & Chips ---------- */
+.stat-points {
+    background: linear-gradient(135deg, #34d399, #22d3ee);
+    border-color: transparent; color: #071322;
+}
+.stat-points .stat-lbl { color: rgba(7, 19, 34, .75); }
+.stat-rank { background: #3a2f10; border-color: #665318; }
+.stat-open { background: #33251a; border-color: #5c452a; }
+
+.score-final { background: linear-gradient(135deg, #34d399, #22d3ee); color: #071322; }
+.score-final .decided { background: rgba(0, 0, 0, .22); color: #071322; }
+
+.bet-chip.pts-0 { background: #232c3d; color: var(--muted); }
+.bet-chip.pts-1 { background: #3a2f10; color: var(--yellow); }
+
+/* ---------- Status, Meldungen, Badges ---------- */
+.status-scheduled { background: #232c3d; color: var(--muted); }
+.status-live      { background: #3d2026; color: var(--red); }
+.flash-success    { border-color: rgba(16, 185, 129, .35); }
+.flash-error      { background: #331d22; color: #fda4a4; border-color: #5c2e36; }
+.autosave-note    { border-color: rgba(16, 185, 129, .35); }
+.badge-missing    { background: #3d2026; color: var(--red); }
+.badge-admin      { background: #3a2f10; color: var(--yellow); }
+
+/* ---------- Tabellen ---------- */
+.table th { background: #1b2740; color: #9fb4d8; }
+.me-row { background: rgba(251, 191, 36, .08); }
+.you-tag { color: var(--green-dark); }
+.group-table .q-third td { background: rgba(251, 191, 36, .10); }
+.legend .dot.q-top   { border-color: rgba(16, 185, 129, .45); }
+.legend .dot.q-third { background: rgba(251, 191, 36, .18); border-color: rgba(251, 191, 36, .45); }
+
+/* ---------- Banner & Kacheln ---------- */
+.cta-banner    { background: linear-gradient(135deg, #2563eb, #7c3aed); }
+.cta-secondary { background: #1d2940; }
+
+/* ---------- Turnierbaum ---------- */
+.round-head {
+    background: linear-gradient(135deg, #34d399, #22d3ee);
+    color: #071322;
+}
+.round-head-third { background: #33425e; color: var(--ink); }
+.round-tab { background: #1d2940; color: var(--ink); border-color: #33436199; }
+.round-tab.is-active {
+    background: linear-gradient(135deg, #34d399, #22d3ee);
+    border-color: transparent; color: #071322;
+}
+
+/* ---------- Navigation: Glas-Effekt ---------- */
+.bottomnav {
+    background: rgba(14, 20, 32, .88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, .35);
+}
+
+/* =====================================================================
+   Dezente Animationen (nur, wenn keine reduzierte Bewegung gewünscht ist)
+   ===================================================================== */
+@media (prefers-reduced-motion: no-preference) {
+    /* Karten gleiten beim Laden sanft nach oben. */
+    @keyframes modern-rise {
+        from { opacity: 0; transform: translateY(10px); }
+        to   { opacity: 1; transform: none; }
+    }
+    .card, .bet-card, .match-row, .stat-card, .admin-tile, .match-admin-row {
+        animation: modern-rise .45s ease both;
+    }
+    .stat-grid .stat-card:nth-child(2) { animation-delay: .06s; }
+    .stat-grid .stat-card:nth-child(3) { animation-delay: .12s; }
+    .stat-grid .stat-card:nth-child(4) { animation-delay: .18s; }
+    .match-list .match-row:nth-child(2), .bet-list .bet-card:nth-child(3) { animation-delay: .05s; }
+    .match-list .match-row:nth-child(3), .bet-list .bet-card:nth-child(4) { animation-delay: .10s; }
+    .match-list .match-row:nth-child(4), .bet-list .bet-card:nth-child(5) { animation-delay: .15s; }
+
+    /* Lebendiger Farbverlauf in der Kopfzeile. */
+    @keyframes modern-pan {
+        from { background-position: 0% 50%; }
+        to   { background-position: 100% 50%; }
+    }
+    .topbar { animation: modern-pan 16s ease-in-out infinite alternate; }
+
+    /* Sanfte Hover-Reaktionen. */
+    .btn, .admin-tile, .cta-banner, .bottomnav a { transition: transform .15s ease, box-shadow .15s ease, background .2s ease, color .2s ease; }
+    .btn:hover { transform: translateY(-1px); }
+    .admin-tile:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(0, 0, 0, .45); }
+    .score-input, .input { transition: border-color .15s ease, box-shadow .15s ease; }
+    .score-input:focus { box-shadow: 0 0 0 4px rgba(52, 211, 153, .18); }
+}

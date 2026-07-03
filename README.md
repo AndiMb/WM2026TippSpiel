@@ -18,6 +18,12 @@ App-Installation.
 * **Mehrsprachig (Deutsch / Portugiesisch)** – Sprache je Benutzer wählbar
   (Konto → Sprache) mit Umschalter auf der Login-Seite; inkl. übersetzter
   Ländernamen.
+* **Drei Ansichten (Designs)** – je Benutzer wählbar (Konto → Ansicht oder
+  durch den Admin): **Standard**, **Kinder** (extra groß und bunt, für junge
+  Mitspieler) und **Modern** (dunkles Design mit dezenten Animationen).
+* **Automatisches Speichern** – Tipps werden beim Eintippen automatisch
+  gespeichert (ohne Speichern-Button); ohne JavaScript erscheint ein
+  klassischer Button als Fallback.
 * **Ländernamen + Flaggen** – Mannschaftsnamen in der gewählten Sprache und
   lokale SVG-Flaggen (anpassbar in `src/Data/teams.php`), damit auch
   Lese-Anfänger die Teams erkennen. Keine externen Server zur Laufzeit.

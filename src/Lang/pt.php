@@ -46,6 +46,7 @@ return [
     'flash.bonus_saved' => 'Palpites de bónus guardados.',
     'flash.no_change'   => 'Sem alterações.',
     'flash.lang_saved'  => 'Idioma alterado.',
+    'flash.theme_saved' => 'Aparência alterada.',
 
     // Painel
     'dash.hello'        => 'Olá, :name! 👋',
@@ -112,6 +113,14 @@ return [
     'account.language'  => '🌐 Idioma',
     'account.language_label' => 'Idioma da aplicação',
     'account.language_save' => 'Guardar idioma',
+    'account.theme'      => '🎨 Aparência',
+    'account.theme_save' => 'Guardar aparência',
+    'theme.standard'      => 'Padrão',
+    'theme.standard_desc' => 'A vista clássica – clara e simpática.',
+    'theme.kids'          => 'Crianças',
+    'theme.kids_desc'     => 'Extra grande e colorido – perfeito para os mais novos.',
+    'theme.modern'        => 'Moderno',
+    'theme.modern_desc'   => 'Design escuro com animações discretas.',
     'account.bonus'     => '⭐ Perguntas bónus',
     'account.bonus_save'=> 'Guardar palpites de bónus',
     'account.bonus_answer' => 'A tua resposta',

@@ -33,17 +33,19 @@ final class User
         string $password,
         string $displayName,
         string $role = 'player',
-        string $locale = 'de'
+        string $locale = 'de',
+        string $theme = 'standard'
     ): int {
         return DB::insert(
-            'INSERT INTO users (username, password_hash, display_name, role, locale, joined_at, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?)',
+            'INSERT INTO users (username, password_hash, display_name, role, locale, theme, joined_at, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 $username,
                 password_hash($password, PASSWORD_DEFAULT),
                 $displayName,
                 $role,
                 $locale,
+                $theme,
                 DB::now(),   // Beitrittszeitpunkt = jetzt (relevant für Variante B)
                 DB::now(),
             ]
@@ -56,16 +58,22 @@ final class User
         DB::run('UPDATE users SET locale = ? WHERE id = ?', [$locale, $id]);
     }
 
+    /** Bevorzugte Ansicht (Design) eines Benutzers setzen. */
+    public static function updateTheme(int $id, string $theme): void
+    {
+        DB::run('UPDATE users SET theme = ? WHERE id = ?', [$theme, $id]);
+    }
+
     public static function updatePassword(int $id, string $password): void
     {
         DB::run('UPDATE users SET password_hash = ? WHERE id = ?',
             [password_hash($password, PASSWORD_DEFAULT), $id]);
     }
 
-    public static function update(int $id, string $displayName, string $role, int $isActive, string $locale = 'de'): void
+    public static function update(int $id, string $displayName, string $role, int $isActive, string $locale = 'de', string $theme = 'standard'): void
     {
-        DB::run('UPDATE users SET display_name = ?, role = ?, is_active = ?, locale = ? WHERE id = ?',
-            [$displayName, $role, $isActive, $locale, $id]);
+        DB::run('UPDATE users SET display_name = ?, role = ?, is_active = ?, locale = ?, theme = ? WHERE id = ?',
+            [$displayName, $role, $isActive, $locale, $theme, $id]);
     }
 
     public static function delete(int $id): void

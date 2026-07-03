@@ -1,0 +1,86 @@
+/* =====================================================================
+   Kinder-Ansicht („kids") – Überschreibungs-Schicht auf style.css.
+   Ziel: extra groß, bunt und freundlich für Mitspieler ab ca. 10 Jahren.
+   Wird nur geladen, wenn der Benutzer diese Ansicht gewählt hat
+   (Konto → Ansicht); gleiche Selektoren gewinnen durch die Ladereihenfolge.
+   ===================================================================== */
+
+:root {
+    --green:       #22ab67;
+    --green-dark:  #157a47;
+    --green-light: #dcf5e7;
+    --yellow:      #ffd23f;
+    --bg:          #e9f5ff;   /* freundliches Himmelblau */
+    --border:      #b9d8ec;
+    --radius:      22px;
+    --tap:         56px;
+    --shadow:      0 3px 12px rgba(30, 80, 140, .10);
+}
+
+body { font-size: 19px; }
+
+/* Verspielte, runde Schrift nur für Überschriften – Fließtext bleibt gut lesbar. */
+.page-title, .section-title, .day-head, .brand-text, .login-title, .round-head {
+    font-family: "Comic Sans MS", "Comic Sans", "Segoe Print", "Chalkboard SE", sans-serif;
+}
+.page-title { font-size: 28px; }
+.section-title { font-size: 22px; }
+
+/* ---------- Kopfzeile ---------- */
+.topbar { background: linear-gradient(120deg, #22ab67, #1b8a5a); }
+.brand-ball { font-size: 30px; }
+
+/* ---------- Karten & Buttons: dicker, runder, bunter ---------- */
+.card, .bet-card, .match-row, .stat-card, .admin-tile, .match-admin-row {
+    border-width: 3px; border-radius: var(--radius);
+}
+.btn { font-size: 18px; border-width: 3px; }
+.btn-primary { box-shadow: 0 4px 0 var(--green-dark); }
+.btn-primary:active { box-shadow: 0 1px 0 var(--green-dark); transform: translateY(3px); }
+
+/* ---------- Tippen: große Flaggen, riesige Eingabefelder ---------- */
+.day-head {
+    display: inline-block; background: var(--yellow); color: #5b4300;
+    padding: 8px 16px; border-radius: 999px; font-size: 17px;
+}
+.day-head::before { content: '📅 '; }
+.bet-flag .flag { width: 56px; height: 42px; border-radius: 8px; }
+.bet-team { font-size: 18px; }
+.score-input {
+    width: 74px; height: 74px; font-size: 34px;
+    border-width: 3px; border-radius: 20px; background: #fffdf2;
+}
+.score-input:focus { outline: 4px solid var(--yellow); border-color: #e0a800; }
+.colon { font-size: 30px; }
+.bet-status.is-saved::after { content: ' ⭐'; }
+.autosave-note { font-size: 15px; border-width: 2px; }
+
+/* ---------- Rangliste & Tabellen ---------- */
+.table th { font-size: 15px; }
+.rank-cell { font-size: 24px; }
+.stat-num { font-size: 34px; }
+
+/* ---------- Navigation: große Symbole ---------- */
+.bottomnav { border-top-width: 3px; }
+.bottomnav a { font-size: 13px; }
+.nav-ico { font-size: 28px; }
+.empty-ico { font-size: 68px; }
+
+@media (max-width: 460px) {
+    .nav-ico { font-size: 24px; }
+    .bottomnav a { font-size: 11px; }
+}
+
+/* ---------- Dezente, fröhliche Bewegung (nur ohne Reduced-Motion) ---------- */
+@media (prefers-reduced-motion: no-preference) {
+    .brand-ball { display: inline-block; animation: kids-roll 7s linear infinite; }
+    @keyframes kids-roll { to { transform: rotate(360deg); } }
+
+    .bottomnav a.is-active .nav-ico {
+        display: inline-block; animation: kids-bounce 2.4s ease-in-out infinite;
+    }
+    @keyframes kids-bounce {
+        0%, 100% { transform: translateY(0); }
+        50%      { transform: translateY(-5px); }
+    }
+}

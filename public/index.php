@@ -65,6 +65,7 @@ $router->get('/konto',         [AccountController::class, 'index']);
 $router->post('/konto/passwort',[AccountController::class, 'changePassword']);
 $router->post('/konto/bonus',  [AccountController::class, 'saveBonus']);
 $router->post('/konto/sprache',[AccountController::class, 'saveLanguage']);
+$router->post('/konto/ansicht',[AccountController::class, 'saveTheme']);
 
 // --- Admin -------------------------------------------------------------
 $router->get('/admin',                 [AdminController::class, 'index']);

@@ -90,6 +90,23 @@ function t(string $key, array $params = []): string
 }
 
 /**
+ * Verfügbare Ansichten (Designs) der Oberfläche.
+ * 'standard' = bisherige Ansicht, 'kids' = groß & bunt für Kinder,
+ * 'modern' = dunkles Design mit Animationen. Je Benutzer wählbar (Konto).
+ */
+function app_themes(): array
+{
+    return ['standard', 'kids', 'modern'];
+}
+
+/** Normalisiert einen Ansicht-Namen auf einen gültigen Wert. */
+function theme_normalize(?string $theme): string
+{
+    $theme = strtolower(trim((string) $theme));
+    return in_array($theme, app_themes(), true) ? $theme : 'standard';
+}
+
+/**
  * Ermittelt, ob ein KO-Spiel erst in der Verlängerung oder im Elfmeterschießen
  * entschieden wurde – für den Hinweis „n.V." / „i.E." neben dem Ergebnis.
  *

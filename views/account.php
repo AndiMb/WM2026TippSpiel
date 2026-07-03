@@ -29,6 +29,24 @@
     </form>
 </section>
 
+<section class="section card">
+    <h2 class="section-title"><?= e(t('account.theme')) ?></h2>
+    <form method="post" action="<?= e(url('/konto/ansicht')) ?>" class="form">
+        <?= csrf_field() ?>
+        <?php foreach (app_themes() as $th): ?>
+            <label class="radio-card">
+                <input type="radio" name="theme" value="<?= e($th) ?>"
+                       <?= theme_normalize($me['theme'] ?? 'standard') === $th ? 'checked' : '' ?>>
+                <span>
+                    <strong><?= e(t('theme.' . $th)) ?></strong>
+                    <small class="hint"><?= e(t('theme.' . $th . '_desc')) ?></small>
+                </span>
+            </label>
+        <?php endforeach; ?>
+        <button class="btn btn-primary" type="submit"><?= e(t('account.theme_save')) ?></button>
+    </form>
+</section>
+
 <?php if ($bonusEnabled && $bonusQuestions): ?>
 <section class="section card">
     <h2 class="section-title"><?= e(t('account.bonus')) ?></h2>

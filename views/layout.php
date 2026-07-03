@@ -1,17 +1,23 @@
 <?php
 /** @var string $title @var string $content @var array $flashes @var ?array $user @var bool $isAdmin @var string $active */
 $lang = \App\Core\Lang::locale();
+// Ansicht (Design) des eingeloggten Benutzers; Gäste sehen den Standard.
+$theme = theme_normalize($user['theme'] ?? 'standard');
+$themeColors = ['standard' => '#1b8a5a', 'kids' => '#22ab67', 'modern' => '#0e1420'];
 ?><!DOCTYPE html>
 <html lang="<?= e($lang) ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#1b8a5a">
+    <meta name="theme-color" content="<?= e($themeColors[$theme] ?? '#1b8a5a') ?>">
     <title><?= e($title) ?> · <?= e(config('app.name')) ?></title>
     <link rel="stylesheet" href="<?= e(url('/assets/css/style.css')) ?>?v=8">
+    <?php if ($theme !== 'standard'): ?>
+        <link rel="stylesheet" href="<?= e(url('/assets/css/theme-' . $theme . '.css')) ?>?v=1">
+    <?php endif; ?>
     <link rel="icon" href="<?= e(url('/assets/img/favicon.svg')) ?>" type="image/svg+xml">
 </head>
-<body>
+<body class="theme-<?= e($theme) ?>">
 
 <?php if ($user): ?>
 <header class="topbar">

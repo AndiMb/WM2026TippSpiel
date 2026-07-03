@@ -34,6 +34,14 @@
                 <option value="pt">Português</option>
             </select>
         </label>
+        <label class="field">
+            <span class="field-label">Ansicht</span>
+            <select class="input" name="theme">
+                <option value="standard">Standard</option>
+                <option value="kids">Kinder (groß &amp; bunt)</option>
+                <option value="modern">Modern (dunkel)</option>
+            </select>
+        </label>
         <div class="field field-full">
             <button class="btn btn-primary" type="submit">Benutzer anlegen</button>
         </div>
@@ -67,6 +75,15 @@
                         <select class="input" name="locale">
                             <option value="de" <?= ($u['locale'] ?? 'de') === 'de' ? 'selected' : '' ?>>Deutsch</option>
                             <option value="pt" <?= ($u['locale'] ?? 'de') === 'pt' ? 'selected' : '' ?>>Português</option>
+                        </select>
+                    </label>
+                    <label class="field">
+                        <span class="field-label">Ansicht</span>
+                        <select class="input" name="theme">
+                            <?php $uTheme = theme_normalize($u['theme'] ?? 'standard'); ?>
+                            <option value="standard" <?= $uTheme === 'standard' ? 'selected' : '' ?>>Standard</option>
+                            <option value="kids"     <?= $uTheme === 'kids'     ? 'selected' : '' ?>>Kinder (groß &amp; bunt)</option>
+                            <option value="modern"   <?= $uTheme === 'modern'   ? 'selected' : '' ?>>Modern (dunkel)</option>
                         </select>
                     </label>
                     <label class="check">
