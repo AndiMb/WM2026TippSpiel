@@ -84,6 +84,49 @@
         });
     }
 
+    // ===================================================================
+    //  Live-Zwischenstände: solange auf der Seite ein laufendes Spiel
+    //  angezeigt wird, einmal pro Minute /live abfragen und die Stände
+    //  ohne Neuladen aktualisieren. Endet das letzte Spiel, stoppt das
+    //  Polling von selbst.
+    // ===================================================================
+    var liveUrl = document.body.getAttribute('data-live-url');
+    if (liveUrl && window.fetch && document.querySelector('[data-live-badge]')) {
+        var liveTimer = setInterval(pollLive, 60000);
+
+        function pollLive() {
+            fetch(liveUrl, {
+                credentials: 'same-origin',
+                headers: { 'X-Requested-With': 'fetch' }
+            }).then(function (r) {
+                return r.ok ? r.json() : Promise.reject();
+            }).then(function (res) {
+                (res.matches || []).forEach(function (m) {
+                    var score = document.querySelector('[data-live-score="' + m.id + '"]');
+                    if (score && m.s1 !== null && m.s2 !== null) {
+                        var txt = m.s1 + ':' + m.s2 + (m.decided ? ' ' + m.decided : '');
+                        if (score.textContent !== txt) {
+                            score.textContent = txt;
+                            score.classList.remove('score-bump');
+                            void score.offsetWidth;          // Animation neu starten
+                            score.classList.add('score-bump');
+                        }
+                    }
+                    // Spiel beendet -> Badge ummelden und nicht weiter beobachten.
+                    var badge = document.querySelector('[data-live-badge="' + m.id + '"]');
+                    if (badge && m.status === 'finished') {
+                        badge.textContent = res.finished_label || 'FT';
+                        badge.classList.add('is-done');
+                        badge.removeAttribute('data-live-badge');
+                    }
+                });
+                if (!document.querySelector('[data-live-badge]')) {
+                    clearInterval(liveTimer);
+                }
+            }).catch(function () { /* nächster Versuch in einer Minute */ });
+        }
+    }
+
     // Flash-Meldungen nach einigen Sekunden sanft ausblenden.
     document.querySelectorAll('.flash-success').forEach(function (el) {
         setTimeout(function () {

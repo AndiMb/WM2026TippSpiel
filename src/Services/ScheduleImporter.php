@@ -220,6 +220,15 @@ final class ScheduleImporter
             // gesetzte Ergebnisse nicht ohne neuen Wert überschreiben.
             $becameFinished = $existing['status'] !== 'finished' && $m['status'] === 'finished';
 
+            // Live-Zwischenstand (football-data.org) nicht durch die träge
+            // OpenFootball-Quelle zurücksetzen, solange diese das Spiel noch
+            // als offen führt.
+            if ($m['status'] !== 'finished' && $existing['status'] === 'live') {
+                $m['score1'] = $existing['score1'];
+                $m['score2'] = $existing['score2'];
+                $m['status'] = 'live';
+            }
+
             // Falls die Quelle (noch) kein Ergebnis hat, vorhandenes behalten.
             if ($m['status'] !== 'finished' && $existing['status'] === 'finished') {
                 $m['score1'] = $existing['score1'];

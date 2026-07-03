@@ -1,4 +1,4 @@
-<?php /** @var array $upcoming @var array $betMap @var int $openCount @var array $standings @var ?array $me @var array $recent */ ?>
+<?php /** @var array $live @var array $upcoming @var array $betMap @var int $openCount @var array $standings @var ?array $me @var array $recent */ ?>
 
 <h1 class="page-title"><?= e(t('dash.hello', ['name' => $user['display_name']])) ?></h1>
 
@@ -27,6 +27,34 @@
 <a class="cta-banner cta-secondary" href="<?= e(url('/turnier')) ?>">
     <?= e(t('dash.cta_tournament')) ?>
 </a>
+
+<!-- Gerade laufende Spiele (Live-Zwischenstand, aktualisiert sich per JS) -->
+<?php if (!empty($live)): ?>
+<section class="section">
+    <h2 class="section-title"><?= e(t('dash.live')) ?></h2>
+    <div class="match-list">
+        <?php foreach ($live as $m):
+            $bet = $betMap[(int) $m['id']] ?? null; ?>
+            <div class="match-row">
+                <div class="match-info">
+                    <div class="match-teams">
+                        <span class="team"><?= flag($m['team1']) ?> <?= e(tname($m['team1'])) ?></span>
+                        <span class="score-final" data-live-score="<?= (int) $m['id'] ?>"><?= (int) $m['score1'] ?>:<?= (int) $m['score2'] ?></span>
+                        <span class="team"><?= flag($m['team2']) ?> <?= e(tname($m['team2'])) ?></span>
+                        <span class="live-badge" data-live-badge="<?= (int) $m['id'] ?>"><?= e(t('live.badge')) ?></span>
+                    </div>
+                    <div class="match-meta"><?= e(fmt_datetime($m['kickoff'])) ?> <?= e(t('common.clock')) ?></div>
+                </div>
+                <?php if ($bet): ?>
+                    <div class="match-bet">
+                        <span class="bet-chip"><?= e(t('dash.your_bet', ['bet' => (int) $bet['pred1'] . ':' . (int) $bet['pred2']])) ?></span>
+                    </div>
+                <?php endif; ?>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</section>
+<?php endif; ?>
 
 <!-- Nächste Spiele -->
 <section class="section">

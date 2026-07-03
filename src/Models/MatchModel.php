@@ -32,6 +32,26 @@ final class MatchModel
         );
     }
 
+    /** Gerade laufende Spiele (Live-Zwischenstand), nach Anstoß. */
+    public static function live(): array
+    {
+        return DB::all("SELECT * FROM matches WHERE status = 'live' ORDER BY kickoff, id");
+    }
+
+    /**
+     * Laufende sowie kürzlich beendete Spiele – für den /live-Endpunkt,
+     * damit das Frontend ein Spiel auch als "beendet" ummelden kann.
+     */
+    public static function liveOrRecent(int $hours = 6): array
+    {
+        return DB::all(
+            "SELECT * FROM matches
+             WHERE status = 'live' OR (status = 'finished' AND kickoff > ?)
+             ORDER BY kickoff, id",
+            [gmdate('Y-m-d H:i:s', time() - $hours * 3600)]
+        );
+    }
+
     /** Bereits beendete Spiele, absteigend (neueste zuerst). */
     public static function finished(int $limit = 10): array
     {

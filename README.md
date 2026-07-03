@@ -46,6 +46,12 @@ App-Installation.
   ([OpenFootball](https://github.com/openfootball/worldcup.json), kein API-Key)
   – inkl. **JSON-/CSV-Fallback** und manuellem Import.
 * **Ergebnisse** automatisch per Cronjob **oder** manuell durch den Admin.
+* **Live-Zwischenstände (optional)** – mit kostenlosem API-Key von
+  [football-data.org](https://www.football-data.org/) zeigen Dashboard und
+  „Tipps der anderen" laufende Spiele mit pulsierendem **Live**-Badge; die
+  Stände aktualisieren sich ohne Neuladen (ca. minütlich), und beendete Spiele
+  werden sofort gewertet. Funktioniert per Cronjob (`bin/update_live.php`)
+  oder ganz ohne – dann stößt der Seitenaufruf die Aktualisierung an.
 * **Faire Nachhol-Regel** für einen Start während der laufenden WM
   (Variante A: Vergangenes zählt mit 0 Punkten · Variante B: Wertung erst ab
   Beitritt).

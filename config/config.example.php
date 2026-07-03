@@ -63,8 +63,10 @@ return [
         'openfootball_url' =>
             'https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json',
 
-        // Optionaler Fallback: football-data.org (API-Key erforderlich).
-        // Leer lassen, wenn nicht genutzt.
+        // Optional: football-data.org für LIVE-Zwischenstände (laufende Spiele
+        // + sofortige Wertung nach Abpfiff). Kostenlosen API-Key holen unter
+        // https://www.football-data.org/ (WM ist im Gratis-Tarif enthalten,
+        // Stände wenige Minuten verzögert). Leer lassen, wenn nicht genutzt.
         'footballdata_token' => '',
 
         // Lokale Fallback-Datei (JSON oder CSV) für manuellen Import,
