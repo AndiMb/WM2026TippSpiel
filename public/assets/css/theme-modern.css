@@ -67,6 +67,8 @@
 .flash-error      { background: #331d22; color: #fda4a4; border-color: #5c2e36; }
 .autosave-note    { border-color: rgba(16, 185, 129, .35); }
 .badge-missing    { background: #3d2026; color: var(--red); }
+.live-badge       { background: #dc2626; }
+.live-badge.is-done { background: #33425e; }
 .badge-admin      { background: #3a2f10; color: var(--yellow); }
 
 /* ---------- Tabellen ---------- */

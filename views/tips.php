@@ -22,6 +22,9 @@
                 <div class="tip-res">
                     <?php if ($finished): ?>
                         <span class="score-final"><?= (int) $m['score1'] ?>:<?= (int) $m['score2'] ?><?= ko_decided_badge($m) ?></span>
+                    <?php elseif ($m['status'] === 'live' && $m['score1'] !== null): ?>
+                        <span class="score-final" data-live-score="<?= (int) $m['id'] ?>"><?= (int) $m['score1'] ?>:<?= (int) $m['score2'] ?></span>
+                        <span class="live-badge" data-live-badge="<?= (int) $m['id'] ?>"><?= e(t('live.badge')) ?></span>
                     <?php else: ?>
                         <span class="status status-live"><?= e(t('tips.live')) ?></span>
                     <?php endif; ?>

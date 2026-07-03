@@ -198,10 +198,19 @@ php bin/import_schedule.php
 
 # Ergebnisse während der WM alle 30 Minuten aktualisieren und Tipps werten
 */30 * * * * /usr/bin/php /var/www/tippspiel/bin/update_results.php >> /var/log/tippspiel_results.log 2>&1
+
+# Optional: Live-Zwischenstände (benötigt football-data.org-Key in config.php).
+# Außerhalb von Spielzeiten macht das Skript keinen API-Aufruf.
+* * * * * /usr/bin/php /var/www/tippspiel/bin/update_live.php >> /var/log/tippspiel_live.log 2>&1
 ```
 
 > Steht keine API zur Verfügung, kann der Ergebnis-Cronjob entfallen – der Admin
 > trägt Ergebnisse dann manuell ein (Admin → Spiele & Ergebnisse).
+>
+> Der Live-Cronjob ist optional: Auch ohne ihn werden Live-Stände aktualisiert,
+> sobald jemand die Seite benutzt (der `/live`-Endpunkt stößt den – auf einmal
+> pro Minute gedrosselten – Abruf an). Erlaubt der Hoster nur gröbere
+> Cron-Raster (z. B. alle 5 Minuten), ist auch das völlig in Ordnung.
 
 Pfad zur PHP-CLI ermitteln: `which php`.
 

@@ -31,6 +31,7 @@ final class DashboardController
 
         View::render('dashboard', [
             '_active'    => 'dashboard',
+            'live'       => MatchModel::live(),
             'upcoming'   => $upcoming,
             'betMap'     => $betMap,
             'openCount'  => Bet::openCount($uid),
