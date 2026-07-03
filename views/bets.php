@@ -84,9 +84,13 @@ $teamHint = function (string $en) use ($forms): string {
     <?php endforeach; ?>
     </div>
 
-    <div class="sticky-save">
-        <button class="btn btn-primary btn-lg btn-block" type="submit"><?= e(t('bets.save')) ?></button>
-    </div>
+    <?php /* Tipps werden automatisch gespeichert (siehe app.js). Der Button
+             bleibt nur als Fallback für Browser ohne JavaScript erhalten. */ ?>
+    <noscript>
+        <div class="sticky-save">
+            <button class="btn btn-primary btn-lg btn-block" type="submit"><?= e(t('bets.save')) ?></button>
+        </div>
+    </noscript>
 </form>
 <script type="application/json" id="autosave-i18n"><?= json_encode([
     'saving' => t('bets.saving'),

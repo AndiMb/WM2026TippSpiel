@@ -46,6 +46,7 @@ return [
     'flash.bonus_saved' => 'Bonus-Tipps gespeichert.',
     'flash.no_change'   => 'Keine Änderungen.',
     'flash.lang_saved'  => 'Sprache geändert.',
+    'flash.theme_saved' => 'Ansicht geändert.',
 
     // Dashboard
     'dash.hello'        => 'Hallo, :name! 👋',
@@ -112,6 +113,14 @@ return [
     'account.language'  => '🌐 Sprache',
     'account.language_label' => 'Anzeigesprache',
     'account.language_save' => 'Sprache speichern',
+    'account.theme'      => '🎨 Ansicht',
+    'account.theme_save' => 'Ansicht speichern',
+    'theme.standard'      => 'Standard',
+    'theme.standard_desc' => 'Die bewährte Ansicht – klar und freundlich.',
+    'theme.kids'          => 'Kinder',
+    'theme.kids_desc'     => 'Extra groß und bunt – perfekt für junge Tipper.',
+    'theme.modern'        => 'Modern',
+    'theme.modern_desc'   => 'Dunkles Design mit dezenten Animationen.',
     'account.bonus'     => '⭐ Bonusfragen',
     'account.bonus_save'=> 'Bonus-Tipps speichern',
     'account.bonus_answer' => 'Deine Antwort',

@@ -57,6 +57,19 @@ final class AccountController
         redirect('/konto');
     }
 
+    /** Ansicht (Design) des Benutzers ändern. */
+    public function saveTheme(): void
+    {
+        Auth::requireLogin();
+        $uid = Auth::id();
+
+        $theme = theme_normalize((string) ($_POST['theme'] ?? 'standard'));
+        User::updateTheme($uid, $theme);
+
+        Session::flash('success', t('flash.theme_saved'));
+        redirect('/konto');
+    }
+
     /** Anzeigesprache des Benutzers ändern. */
     public function saveLanguage(): void
     {
