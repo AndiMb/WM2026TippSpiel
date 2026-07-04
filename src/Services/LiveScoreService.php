@@ -71,10 +71,14 @@ final class LiveScoreService
         }
 
         // Nur abrufen, wenn gerade plausibel ein Spiel läuft (Anstoß in den
-        // letzten 4 Stunden oder in den nächsten 10 Minuten, noch nicht beendet).
+        // letzten 4 Stunden oder in den nächsten 10 Minuten) ODER ein Spiel
+        // noch auf 'live' steht. Letzteres unabhängig vom Anstoßalter: endet
+        // ein Spiel, während niemand abruft, bliebe es sonst für immer
+        // "live" hängen und die Tipps würden nie gewertet.
         $window = (int) DB::scalar(
             "SELECT COUNT(*) FROM matches
-             WHERE status != 'finished' AND kickoff BETWEEN ? AND ?",
+             WHERE status = 'live'
+                OR (status != 'finished' AND kickoff BETWEEN ? AND ?)",
             [gmdate('Y-m-d H:i:s', time() - 4 * 3600), gmdate('Y-m-d H:i:s', time() + 600)]
         );
         if ($window === 0 && !$force) {
@@ -83,8 +87,18 @@ final class LiveScoreService
 
         Setting::set('live_last_fetch', (string) time());
 
+        // Abfragezeitraum: gestern..morgen – bei hängengebliebenen Live-Spielen
+        // so weit zurück, dass auch deren Endergebnis mitkommt.
+        $from = time() - 86400;
+        $oldestLive = DB::scalar("SELECT MIN(kickoff) FROM matches WHERE status = 'live'");
+        if ($oldestLive !== null && $oldestLive !== false) {
+            $ts = strtotime((string) $oldestLive . ' UTC');
+            if ($ts !== false && $ts - 86400 < $from) {
+                $from = $ts - 86400;
+            }
+        }
         $url = self::API_URL
-            . '?dateFrom=' . gmdate('Y-m-d', time() - 86400)
+            . '?dateFrom=' . gmdate('Y-m-d', $from)
             . '&dateTo='   . gmdate('Y-m-d', time() + 86400);
         $raw = self::httpGet($url, $token);
         if ($raw === null) {
@@ -138,11 +152,6 @@ final class LiveScoreService
                 continue;
             }
 
-            // Beendetes Spiel: bereits abgeschlossene nicht erneut anfassen
-            // (OpenFootball bzw. Admin bleiben die letzte Instanz).
-            if ($match['status'] === 'finished') {
-                continue;
-            }
             $mapped = self::mapFinished($score);
             if ($mapped === null) {
                 continue; // ohne verwertbares Ergebnis nichts erzwingen
@@ -150,6 +159,19 @@ final class LiveScoreService
             [$s1, $s2, $et1, $et2, $p1, $p2] = $mapped;
             if ($swap) {
                 [$s1, $s2, $et1, $et2, $p1, $p2] = [$s2, $s1, $et2, $et1, $p2, $p1];
+            }
+
+            // Bereits beendet UND identisches Ergebnis -> nichts zu tun.
+            // Weicht das Ergebnis ab (die API korrigiert gelegentlich kurz
+            // nach Abpfiff), wird aktualisiert und NEU gewertet – sonst
+            // blieben die Punkte der alten, falschen Wertung stehen.
+            if ($match['status'] === 'finished'
+                && (int) $match['score1'] === $s1 && (int) $match['score2'] === $s2
+                && self::intOrNull($match['et1'] ?? null) === $et1
+                && self::intOrNull($match['et2'] ?? null) === $et2
+                && self::intOrNull($match['pen1'] ?? null) === $p1
+                && self::intOrNull($match['pen2'] ?? null) === $p2) {
+                continue;
             }
             MatchModel::setResult((int) $match['id'], $s1, $s2, 'finished', $et1, $et2, $p1, $p2);
             ScoringService::scoreMatch((int) $match['id']);
@@ -189,6 +211,12 @@ final class LiveScoreService
 
         // EXTRA_TIME: fullTime = Stand nach Verlängerung (ohne Elfmeter).
         return [$rt[0], $rt[1], $ft[0], $ft[1], null, null];
+    }
+
+    /** DB-Wert (kann String/NULL sein) als int oder null. */
+    private static function intOrNull($v): ?int
+    {
+        return $v === null ? null : (int) $v;
     }
 
     /** [home, away] als int-Paar oder null, wenn unvollständig. */
