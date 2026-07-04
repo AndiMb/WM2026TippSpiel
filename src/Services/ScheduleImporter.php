@@ -240,10 +240,17 @@ final class ScheduleImporter
                 $m['pen2'] = $existing['pen2'] ?? null;
             }
 
+            // Ergebnis-Korrektur erkennen: Spiel war schon beendet, die Quelle
+            // liefert jetzt aber einen anderen Endstand -> Tipps NEU werten.
+            // (Ohne das blieben nach einer Korrektur die alten Punkte stehen.)
+            $resultChanged = $existing['status'] === 'finished'
+                && $m['status'] === 'finished'
+                && self::resultKey($existing) !== self::resultKey($m);
+
             MatchModel::updateFromImport((int) $existing['id'], $m);
             $updated++;
 
-            if ($becameFinished) {
+            if ($becameFinished || $resultChanged) {
                 ScoringService::scoreMatch((int) $existing['id']);
                 $scored++;
             }
@@ -310,6 +317,15 @@ final class ScheduleImporter
     private static function extKey(string $kickoff, string $team1, string $team2): string
     {
         return substr($kickoff, 0, 10) . '|' . $team1 . '|' . $team2;
+    }
+
+    /** Vergleichsschlüssel eines Endergebnisses (inkl. Verlängerung/Elfmeter). */
+    private static function resultKey(array $m): string
+    {
+        $v = static fn($x) => $x === null ? '-' : (string) (int) $x;
+        return $v($m['score1'] ?? null) . ':' . $v($m['score2'] ?? null)
+            . '|' . $v($m['et1'] ?? null) . ':' . $v($m['et2'] ?? null)
+            . '|' . $v($m['pen1'] ?? null) . ':' . $v($m['pen2'] ?? null);
     }
 
     /**
