@@ -283,6 +283,197 @@
         }
     }
 
+    // ===================================================================
+    //  Siegerehrung: Rangliste vom letzten zum ersten Platz enthüllen,
+    //  mit etwas Konfetti als kleines Extra fürs Saisonende.
+    // ===================================================================
+    var ceremonyStage = document.getElementById('ceremony-stage');
+    if (ceremonyStage) {
+        var ceremonyData = [];
+        try { ceremonyData = JSON.parse((document.getElementById('ceremony-data') || {}).textContent || '[]'); } catch (e) {}
+        var ceremonyI18n = {};
+        try { ceremonyI18n = JSON.parse((document.getElementById('ceremony-i18n') || {}).textContent || '{}'); } catch (e) {}
+
+        var cList     = document.getElementById('ceremony-list');
+        var cProgress = document.getElementById('ceremony-progress');
+        var cNextBtn  = document.getElementById('ceremony-next');
+        var cSkipBtn  = document.getElementById('ceremony-skip');
+        var cCard     = document.getElementById('ceremony-card');
+        var cFinale   = document.getElementById('ceremony-finale');
+        var cRestart  = document.getElementById('ceremony-restart');
+        var cCanvas   = document.getElementById('ceremony-confetti');
+        var total     = ceremonyData.length;
+        var idx       = 0;                     // Index in ceremonyData (0 = letzter Platz)
+        var reduced   = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        function itemHtml(item) {
+            var youTag = item.isMe ? ' <span class="you-tag">' + escapeHtml(ceremonyI18n.you || '') + '</span>' : '';
+            return '<span class="rank-cell">' + (item.medal || item.rank) + '</span>'
+                 + '<span class="ceremony-item-name">' + escapeHtml(item.name) + youTag + '</span>'
+                 + '<span class="ceremony-item-pts">' + item.points + ' ' + escapeHtml(ceremonyI18n.points || '') + '</span>';
+        }
+
+        // Neu enthüllten Platz oben in die wachsende Liste einfügen – da jeder
+        // weitere Platz einen besseren Rang hat, bleibt die Liste dabei immer
+        // in der richtigen Reihenfolge (Platz 1 landet zum Schluss ganz oben).
+        function prependToList(item) {
+            var li = document.createElement('li');
+            li.className = 'ceremony-item' + (item.isMe ? ' is-me' : '') + (item.rank <= 3 ? ' is-podium' : '');
+            li.innerHTML = itemHtml(item);
+            cList.insertBefore(li, cList.firstChild);
+        }
+
+        function showStage(item) {
+            cProgress.textContent = (ceremonyI18n.rankOf || '')
+                .replace(':rank', String(item.rank)).replace(':total', String(total));
+            cCard.classList.remove('is-me-highlight');
+            var big = item.rank === 1 ? ' ceremony-stage-first' : (item.rank <= 3 ? ' ceremony-stage-podium' : '');
+            cCard.classList.toggle('is-me-highlight', !!item.isMe);
+            cStageInnerUpdate(item, big);
+        }
+
+        function cStageInnerUpdate(item, extraClass) {
+            ceremonyStage.className = 'ceremony-stage ceremony-pop' + extraClass;
+            // Reflow erzwingen, damit die Animation bei jedem Platz neu startet.
+            void ceremonyStage.offsetWidth;
+            ceremonyStage.classList.add('ceremony-pop-play');
+            var youTag = item.isMe ? ' <span class="you-tag">' + escapeHtml(ceremonyI18n.you || '') + '</span>' : '';
+            ceremonyStage.innerHTML =
+                '<div class="ceremony-medal">' + (item.medal || ('#' + item.rank)) + '</div>' +
+                '<div class="ceremony-name">' + escapeHtml(item.name) + youTag + '</div>' +
+                '<div class="ceremony-points">' + item.points + ' ' + escapeHtml(ceremonyI18n.points || '') + '</div>';
+        }
+
+        function revealStep() {
+            if (idx >= total) return;
+            var item = ceremonyData[idx];
+            showStage(item);
+            prependToList(item);
+            if (!reduced) {
+                var size = item.rank === 1 ? 'huge' : (item.rank <= 3 ? 'big' : 'small');
+                confettiBurst(size);
+            }
+            idx++;
+            if (idx >= total) {
+                cNextBtn.hidden = true;
+                cSkipBtn.hidden = true;
+                cFinale.hidden = false;
+                if (!reduced) { setTimeout(function () { confettiBurst('huge'); }, 250); }
+            } else {
+                cNextBtn.textContent = ceremonyI18n.next || cNextBtn.textContent;
+            }
+        }
+
+        function revealAllInstant() {
+            while (idx < total) {
+                var item = ceremonyData[idx];
+                prependToList(item);
+                idx++;
+            }
+            ceremonyStage.hidden = true;
+            cNextBtn.hidden = true;
+            cSkipBtn.hidden = true;
+            cFinale.hidden = false;
+        }
+
+        function restart() {
+            idx = 0;
+            cList.innerHTML = '';
+            cFinale.hidden = true;
+            ceremonyStage.hidden = false;
+            ceremonyStage.className = 'ceremony-stage';
+            ceremonyStage.innerHTML = '';
+            cNextBtn.hidden = false;
+            cNextBtn.textContent = cNextBtn.getAttribute('data-start-label') || cNextBtn.textContent;
+            cSkipBtn.hidden = false;
+            // Bewegungsreduzierung bleibt auch nach "Nochmal von vorne" respektiert.
+            if (reduced) { revealAllInstant(); }
+        }
+
+        cNextBtn.setAttribute('data-start-label', cNextBtn.textContent);
+        cNextBtn.addEventListener('click', revealStep);
+        cSkipBtn.addEventListener('click', revealAllInstant);
+        if (cRestart) cRestart.addEventListener('click', restart);
+
+        // Wer keine Bewegung wünscht, bekommt sofort die fertige Liste ohne
+        // Konfetti und ohne Schritt-für-Schritt-Enthüllung.
+        if (reduced) {
+            revealAllInstant();
+        }
+
+        // --- Minimales, abhängigkeitsfreies Konfetti (Canvas) ---------------
+        var confettiColors = null;
+        function getConfettiColors() {
+            if (confettiColors) return confettiColors;
+            var cs = getComputedStyle(document.documentElement);
+            confettiColors = [
+                cs.getPropertyValue('--green').trim()  || '#1b8a5a',
+                cs.getPropertyValue('--yellow').trim() || '#f6c343',
+                cs.getPropertyValue('--blue').trim()   || '#2563eb',
+                cs.getPropertyValue('--red').trim()    || '#d64545',
+                '#ffffff'
+            ];
+            return confettiColors;
+        }
+
+        var particles = [];
+        var confettiRunning = false;
+        function confettiBurst(size) {
+            if (!cCanvas || !cCanvas.getContext) return;
+            var counts = { small: 18, big: 60, huge: 130 };
+            var count = counts[size] || counts.small;
+            var colors = getConfettiColors();
+            var w = window.innerWidth, h = window.innerHeight;
+            cCanvas.width = w; cCanvas.height = h;
+            for (var i = 0; i < count; i++) {
+                particles.push({
+                    x: w / 2 + (Math.random() - 0.5) * w * (size === 'small' ? 0.3 : 0.8),
+                    y: -20 - Math.random() * 60,
+                    vx: (Math.random() - 0.5) * 5,
+                    vy: 2 + Math.random() * 3.5,
+                    rot: Math.random() * 360,
+                    vr: (Math.random() - 0.5) * 14,
+                    size: 5 + Math.random() * 6,
+                    color: colors[(Math.random() * colors.length) | 0],
+                    life: 0,
+                    maxLife: 110 + Math.random() * 60
+                });
+            }
+            if (!confettiRunning) { confettiRunning = true; requestAnimationFrame(confettiTick); }
+        }
+
+        function confettiTick() {
+            var ctx = cCanvas.getContext('2d');
+            ctx.clearRect(0, 0, cCanvas.width, cCanvas.height);
+            var alive = [];
+            for (var i = 0; i < particles.length; i++) {
+                var p = particles[i];
+                p.x += p.vx; p.y += p.vy; p.vy += 0.06; p.rot += p.vr; p.life++;
+                if (p.life < p.maxLife && p.y < cCanvas.height + 30) {
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.rot * Math.PI / 180);
+                    ctx.fillStyle = p.color;
+                    ctx.globalAlpha = Math.max(0, 1 - p.life / p.maxLife);
+                    ctx.fillRect(-p.size / 2, -p.size / 3, p.size, p.size * 0.6);
+                    ctx.restore();
+                    alive.push(p);
+                }
+            }
+            particles = alive;
+            if (particles.length > 0) {
+                requestAnimationFrame(confettiTick);
+            } else {
+                confettiRunning = false;
+                ctx.clearRect(0, 0, cCanvas.width, cCanvas.height);
+            }
+        }
+
+        window.addEventListener('resize', function () {
+            if (cCanvas) { cCanvas.width = window.innerWidth; cCanvas.height = window.innerHeight; }
+        });
+    }
+
     function escapeHtml(s) {
         return String(s == null ? '' : s)
             .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
