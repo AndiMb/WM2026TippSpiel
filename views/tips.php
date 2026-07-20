@@ -1,7 +1,53 @@
-<?php /** @var array $matches @var int $meId */ ?>
+<?php /** @var array $matches @var bool $bonusEnabled @var array $bonusOverview @var int $meId */ ?>
 
 <h1 class="page-title"><?= e(t('tips.title')) ?></h1>
 <p class="muted intro"><?= e(t('tips.intro')) ?></p>
+
+<?php if ($bonusEnabled && $bonusOverview): ?>
+    <section class="section">
+        <h2 class="section-title"><?= e(t('tips.bonus_title')) ?></h2>
+        <p class="muted intro"><?= e(t('tips.bonus_intro')) ?></p>
+        <?php foreach ($bonusOverview as $q): ?>
+            <section class="card tip-block">
+                <div class="tip-head">
+                    <div class="tip-teams">
+                        <?= e($q['question']) ?>
+                        <span class="muted">(<?= (int) $q['points'] ?> <?= e(t('common.points_short')) ?>)</span>
+                    </div>
+                    <?php if ($q['resolved']): ?>
+                        <span class="score-final"><?= e($q['correct_answer']) ?></span>
+                    <?php else: ?>
+                        <span class="status status-live"><?= e(t('tips.bonus_open')) ?></span>
+                    <?php endif; ?>
+                </div>
+
+                <table class="table tip-table">
+                    <tbody>
+                    <?php foreach ($q['answers'] as $a): ?>
+                        <tr class="<?= $a['user_id'] === $meId ? 'me-row' : '' ?>">
+                            <td><?= e($a['name']) ?><?= $a['user_id'] === $meId ? ' <span class="you-tag">' . e(t('standings.you')) . '</span>' : '' ?></td>
+                            <td class="tip-pred">
+                                <?php if ($a['has_answer']): ?>
+                                    <?= e($a['answer']) ?>
+                                <?php else: ?>
+                                    <span class="muted">–</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="num">
+                                <?php if ($a['points'] !== null): ?>
+                                    <span class="bet-chip pts-<?= (int) $a['points'] ?>"><?= (int) $a['points'] ?> <?= e(t('common.points_short')) ?></span>
+                                <?php elseif ($a['has_answer'] && $q['resolved']): ?>
+                                    <span class="bet-chip pts-0">0 <?= e(t('common.points_short')) ?></span>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </section>
+        <?php endforeach; ?>
+    </section>
+<?php endif; ?>
 
 <?php if (!$matches): ?>
     <div class="empty">

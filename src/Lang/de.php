@@ -104,6 +104,9 @@ return [
     'tips.empty_title'  => 'Noch keine angepfiffenen Spiele.',
     'tips.empty_sub'    => 'Sobald das erste Spiel läuft, erscheinen hier die Tipps aller Mitspieler.',
     'tips.live'         => 'läuft',
+    'tips.bonus_title'  => '⭐ Bonusfragen der anderen',
+    'tips.bonus_intro'  => 'Sichtbar sind nur Fragen, die bereits aufgelöst sind oder deren Einsendeschluss verstrichen ist.',
+    'tips.bonus_open'   => 'offen',
 
     // Konto
     'account.title'     => '👤 Mein Konto',
