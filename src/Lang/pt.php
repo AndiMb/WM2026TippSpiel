@@ -104,6 +104,9 @@ return [
     'tips.empty_title'  => 'Ainda não há jogos iniciados.',
     'tips.empty_sub'    => 'Assim que o primeiro jogo começar, aparecem aqui os palpites de todos.',
     'tips.live'         => 'a decorrer',
+    'tips.bonus_title'  => '⭐ Perguntas bónus dos outros',
+    'tips.bonus_intro'  => 'Só são visíveis as perguntas já resolvidas ou cujo prazo de envio já terminou.',
+    'tips.bonus_open'   => 'em aberto',
 
     // Conta
     'account.title'     => '👤 A minha conta',
