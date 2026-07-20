@@ -23,6 +23,10 @@
 
 * { box-sizing: border-box; }
 
+/* Das hidden-Attribut muss IMMER gewinnen – sonst überschreibt jede Klasse mit
+   eigenem "display" (z.B. .btn: inline-flex) das Ausblenden per [hidden]. */
+[hidden] { display: none !important; }
+
 html { -webkit-text-size-adjust: 100%; }
 
 body {
@@ -505,6 +509,59 @@ body {
 /* Spiel um Platz 3 (separat unter dem Baum) */
 .third-place { margin-top: 16px; max-width: 240px; }
 .round-head-third { background: var(--muted); }
+
+/* ---------- Rangliste: Aktionsleiste ---------- */
+.standings-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
+
+/* ---------- Siegerehrung ---------- */
+.ceremony-card { text-align: center; padding: 20px 16px; }
+.ceremony-progress { font-weight: 800; color: var(--muted); font-size: 14px; margin-bottom: 10px; min-height: 1.2em; }
+.ceremony-stage {
+    min-height: 150px; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 4px; padding: 10px;
+}
+.ceremony-medal { font-size: 46px; line-height: 1; }
+.ceremony-name { font-size: 22px; font-weight: 800; margin-top: 4px; }
+.ceremony-points { font-size: 16px; color: var(--muted); font-weight: 700; }
+.ceremony-stage-podium .ceremony-medal { font-size: 58px; }
+.ceremony-stage-podium .ceremony-name { font-size: 26px; color: var(--green-dark); }
+.ceremony-stage-first .ceremony-medal { font-size: 72px; }
+.ceremony-stage-first .ceremony-name { font-size: 30px; color: #a8790a; }
+.ceremony-card.is-me-highlight { box-shadow: 0 0 0 3px var(--yellow), var(--shadow); }
+.ceremony-controls { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 14px 0 6px; }
+
+.ceremony-list { list-style: none; margin: 16px 0 0; padding: 0; text-align: left; display: flex; flex-direction: column; gap: 6px; }
+.ceremony-item {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 8px 12px;
+}
+.ceremony-item.is-podium { background: var(--green-light); border-color: #bce3cd; }
+.ceremony-item.is-me { outline: 2px solid var(--yellow); }
+.ceremony-item .rank-cell { min-width: 1.6em; text-align: center; }
+.ceremony-item-name { flex: 1 1 auto; font-weight: 700; }
+.ceremony-item-pts { font-weight: 800; font-variant-numeric: tabular-nums; color: var(--muted); }
+
+.ceremony-finale { text-align: center; margin: 26px 0; }
+
+.ceremony-confetti {
+    position: fixed; inset: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 9999;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .ceremony-pop-play { animation: ceremony-pop .5s cubic-bezier(.34,1.56,.64,1); }
+    @keyframes ceremony-pop {
+        0%   { transform: scale(.6); opacity: 0; }
+        60%  { transform: scale(1.08); opacity: 1; }
+        100% { transform: scale(1); }
+    }
+    .ceremony-stage-first .ceremony-medal { animation: ceremony-spin 1.2s ease-in-out; }
+    @keyframes ceremony-spin {
+        0%   { transform: rotate(-10deg) scale(.5); }
+        50%  { transform: rotate(8deg) scale(1.15); }
+        100% { transform: rotate(0) scale(1); }
+    }
+}
 
 /* ---------- Barrierefreiheit ---------- */
 @media (prefers-reduced-motion: reduce) {

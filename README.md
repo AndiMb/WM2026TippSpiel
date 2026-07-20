@@ -57,6 +57,8 @@ App-Installation.
   Beitritt).
 * **Konfigurierbares Punktesystem** (exaktes Ergebnis / Tordifferenz / Tendenz).
 * **Rangliste** mit Platz, Punkten, exakten Tipps und richtigen Tendenzen.
+* **Siegerehrung** – die Plätze werden vom letzten zum ersten enthüllt, mit
+  Konfetti und einer Dankeschön-Botschaft an alle Mitspieler (`/siegerehrung`).
 * **Bonusfragen** (Weltmeister, Finalist, Torschützenkönig …), optional
   aktivierbar, mit konfigurierbaren Punkten.
 * **Adminbereich** – Benutzer, Spiele, Ergebnisse, Bonusfragen und Einstellungen

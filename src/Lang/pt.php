@@ -97,6 +97,20 @@ return [
     'standings.col_tendency' => 'Tendência',
     'standings.you'     => '(tu)',
     'standings.legend'  => '<strong>Exato</strong> = resultado certo · <strong>Diferença</strong> = diferença de golos certa · <strong>Tendência</strong> = vencedor/empate certo',
+    'standings.see_ceremony' => '🏆 Ver cerimónia de entrega de prémios',
+
+    // Cerimónia de entrega de prémios
+    'ceremony.title'         => '🏆 Cerimónia de prémios',
+    'ceremony.back'          => '← Para a classificação',
+    'ceremony.subtitle'      => ':count jogadores, um torneio fantástico – que bom que todos participaram! 🎉',
+    'ceremony.intro_hint'    => 'Vamos revelar as posições de trás para a frente – prontos?',
+    'ceremony.start'         => 'Vamos lá 🥁',
+    'ceremony.next'          => 'Próxima posição 🥁',
+    'ceremony.skip'          => 'Mostrar tudo de uma vez',
+    'ceremony.rank_of'       => 'Posição :rank de :total',
+    'ceremony.finished_title'=> '🎉 Parabéns!',
+    'ceremony.finished_sub'  => 'Obrigado aos :count jogadores por um torneio fantástico!',
+    'ceremony.restart'       => '🔁 Recomeçar',
 
     // Palpites dos outros
     'tips.title'        => '👀 Palpites dos outros',

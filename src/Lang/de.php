@@ -97,6 +97,20 @@ return [
     'standings.col_tendency' => 'Tendenz',
     'standings.you'     => '(du)',
     'standings.legend'  => '<strong>Exakt</strong> = genaues Ergebnis getroffen · <strong>Differenz</strong> = richtige Tordifferenz · <strong>Tendenz</strong> = richtiger Sieger/Remis',
+    'standings.see_ceremony' => '🏆 Siegerehrung ansehen',
+
+    // Siegerehrung
+    'ceremony.title'         => '🏆 Siegerehrung',
+    'ceremony.back'          => '← Zur Rangliste',
+    'ceremony.subtitle'      => ':count Mitspieler, ein tolles Turnier – schön, dass alle dabei waren! 🎉',
+    'ceremony.intro_hint'    => 'Wir enthüllen die Plätze von hinten nach vorne – bereit?',
+    'ceremony.start'         => 'Los geht\'s 🥁',
+    'ceremony.next'          => 'Nächster Platz 🥁',
+    'ceremony.skip'          => 'Alle auf einmal zeigen',
+    'ceremony.rank_of'       => 'Platz :rank von :total',
+    'ceremony.finished_title'=> '🎉 Herzlichen Glückwunsch!',
+    'ceremony.finished_sub'  => 'Danke an alle :count Mitspieler für ein tolles Turnier!',
+    'ceremony.restart'       => '🔁 Nochmal von vorne',
 
     // Tipps der anderen
     'tips.title'        => '👀 Tipps der anderen',

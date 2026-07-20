@@ -11,7 +11,7 @@ $themeColors = ['standard' => '#1b8a5a', 'kids' => '#22ab67', 'modern' => '#0e14
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="<?= e($themeColors[$theme] ?? '#1b8a5a') ?>">
     <title><?= e($title) ?> · <?= e(config('app.name')) ?></title>
-    <link rel="stylesheet" href="<?= e(url('/assets/css/style.css')) ?>?v=9">
+    <link rel="stylesheet" href="<?= e(url('/assets/css/style.css')) ?>?v=10">
     <?php if ($theme !== 'standard'): ?>
         <link rel="stylesheet" href="<?= e(url('/assets/css/theme-' . $theme . '.css')) ?>?v=1">
     <?php endif; ?>
@@ -73,6 +73,6 @@ $themeColors = ['standard' => '#1b8a5a', 'kids' => '#22ab67', 'modern' => '#0e14
 </nav>
 <?php endif; ?>
 
-<script src="<?= e(url('/assets/js/app.js')) ?>?v=6" defer></script>
+<script src="<?= e(url('/assets/js/app.js')) ?>?v=7" defer></script>
 </body>
 </html>

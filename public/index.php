@@ -17,6 +17,7 @@ use App\Controllers\StandingsController;
 use App\Controllers\TipsController;
 use App\Controllers\TournamentController;
 use App\Controllers\AccountController;
+use App\Controllers\AwardController;
 use App\Controllers\LiveController;
 use App\Controllers\LegalController;
 use App\Controllers\Admin\AdminController;
@@ -60,6 +61,7 @@ $router->post('/tippen',   [BetController::class, 'save']);
 $router->get('/turnier',   [TournamentController::class, 'index']);
 
 $router->get('/rangliste', [StandingsController::class, 'index']);
+$router->get('/siegerehrung', [AwardController::class, 'index']);
 $router->get('/tipps',     [TipsController::class, 'index']);
 $router->get('/live',      [LiveController::class, 'index']);
 

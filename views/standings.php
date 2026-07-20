@@ -2,7 +2,12 @@
 
 <h1 class="page-title"><?= e(t('standings.title')) ?></h1>
 
-<a class="btn btn-small" href="<?= e(url('/tipps')) ?>"><?= e(t('standings.see_others')) ?></a>
+<div class="standings-actions">
+    <a class="btn btn-small" href="<?= e(url('/tipps')) ?>"><?= e(t('standings.see_others')) ?></a>
+    <?php if ($standings): ?>
+        <a class="btn btn-small" href="<?= e(url('/siegerehrung')) ?>"><?= e(t('standings.see_ceremony')) ?></a>
+    <?php endif; ?>
+</div>
 
 <p class="muted intro">
     <?php if ($scoringMode === 'since_join'): ?>
